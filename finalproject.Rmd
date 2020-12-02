@@ -16,58 +16,70 @@ library(ggplot2)
 ```
 
 #Code 
+Reading the physical journal paper's metadata, and looking at how many journal papers have been published through the years.
 ```{r}
 df_prpaper = read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/phpaper_metadata_latest.csv')
-df_prpaper$paper_pub_date = as.Date(df_prpaper$paper_pub_date)
-df_prpaper$paper_pub_year=format(df_prpaper$paper_pub_date, format = "%Y")
-df_papercount_year = df_prpaper%>%count(paper_pub_year)
-df_papercount_year$paper_pub_year = as.integer(df_papercount_year$paper_pub_year)
+df_prpaper$paper_pub_date = as.Date(df_prpaper$paper_pub_date) #convert paper_pub_date to Date
+df_prpaper$paper_pub_year=format(df_prpaper$paper_pub_date, format = "%Y") #Get the year from the paper_pub_date
+df_papercount_year = df_prpaper%>%count(paper_pub_year)#This is a dataframe that gives the count of published papers each year
+df_papercount_year$paper_pub_year = as.integer(df_papercount_year$paper_pub_year) # converting year to integer
 
 ```
+  
+This is the plot for journal papers published through the years, faceted by decade
 ```{r}
 g_pub_time <- ggplot(df_papercount_year, aes(x=paper_pub_year, y = n))+
   geom_point()
 
+#papers published throughout the decades - A time series
 g_pub_time + facet_wrap(.~(df_papercount_year$paper_pub_year - (df_papercount_year$paper_pub_year %% 10)), scales = 'free', ncol=3, nrow = 6)
 ```
-
+  
+Reading the physical journal paper citation data
 ```{r}
 df_prpapercitations = read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/aps-dataset-citations-2019.csv')
-df_citationsreceived = df_prpapercitations%>%count(cited_doi)
-```
+df_prpapercitations$citing_paper_pub_date=df_prpaper$paper_pub_date[match(df_prpapercitations$citing_doi,df_prpaper$paper_doi)]
+df_prpapercitations$cited_paper_pub_date=df_prpaper$paper_pub_date[match(df_prpapercitations$cited_doi,df_prpaper$paper_doi)]
 
+df_citationsreceived = df_prpapercitations%>%count(cited_doi) #This is a dataframe that shows the number of citations received by each journal paper
+
+```
+  
+This is the density plot for number of citations received, which follows a power law, but it is really difficult to see here as very few papers receive very large citations.
 ```{r}
-#citation_count <-cut(df_lakes$Species,breaks = 3,labels = c('small','medium','large'))
 g <- ggplot(df_citationsreceived, aes(x=n)) +
   geom_density()
 plot(g)
 ```
-
+We have divided the dataframe based on the citation_count and assigned them labels.
+And we draw a box plot to validate our observation further, we can see here clearly that the papers that receive very high citations are sparse.
+  
 ```{r}
-df_prpaper%>%select(paper_doi, paper_pub_date)%>%filter(grepl('Clifford G. Shull',df_prpaper$paper_authors))
-df_citationsreceived%>%filter(cited_doi=='10.1103/RevModPhys.67.753')
+citation_count <- cut(df_citationsreceived$n, breaks = c(0,25,50,75,100,500,max(df_citationsreceived$n)), labels = c('<25 citations', '25-50 citations','50-75 citations','75-100 citations','100-500 citations','more than 500 citations'))
+df_citationsreceived$citation_count <- citation_count
+ggplot(df_citationsreceived, aes(x = reorder(citation_count,-n, FUN = median),y=n))+geom_boxplot(aes(fill=citation_count))
+ggplot(df_citationsreceived%>%dplyr::filter(df_citationsreceived$citation_count!='more than 500 citations'), aes(x = reorder(citation_count,-n, FUN = median),y=n))+geom_boxplot(aes(fill=citation_count))
 ```
-```{r}
-df_prpapercitations$citing_paper_pub_date=df_prpaper$paper_pub_date[match(df_prpapercitations$citing_doi,df_prpaper$paper_doi)]
-df_prpapercitations$cited_paper_pub_date=df_prpaper$paper_pub_date[match(df_prpapercitations$cited_doi,df_prpaper$paper_doi)]
-```
+  
+This produces a graph comparing average number of citations received by a paper and the number of authors of the paper.
 ```{r}
 df_citationsreceived$n_authors=df_prpaper$paper_authors_count[match(df_citationsreceived$cited_doi,df_prpaper$paper_doi)]
 ggplot(df_citationsreceived, aes(x=factor(n_authors), y = n))+stat_summary(fun.y = "mean", geom="point")+theme_light()
 ```
+
+
+
+https://www.nature.com/news/papers-with-shorter-titles-get-more-citations-1.18246 - We use this as a reference to see whether papers with shorter titles get more citations. Indeed we see the pattern here.
+We do some cleaning here to remove the papers where titles have a math function in them. This is because the title length includes html tags in them making the title length longer than the actual title. So we are looking at a subset of the papers.
 ```{r}
 df_temp <- df_prpaper[!grepl("<math",df_prpaper$paper_title),]
 df_temp$paper_title_length <-sapply(strsplit(df_temp$paper_title, " "), length)
 df_temp$n_citations=df_citationsreceived$n[match(df_temp$paper_doi,df_citationsreceived$cited_doi)]
 ggplot(df_temp, aes(x=paper_title_length, y = n_citations))+stat_summary(fun.y = "mean", geom="point")+theme_light()
 ```
-```{r}
-#citation_count <- cut(df_citationsreceived$n, breaks = 5, labels = c('very few citations', 'few #citations','average citations','high citations','very high citations'))
-citation_count <- cut(df_citationsreceived$n, breaks = c(0,25,50,75,100,500,max(df_citationsreceived$n)), labels = c('<25 citations', '25-50 citations','50-75 citations','75-100 citations','100-500 citations','more than 500 citations'))
-df_citationsreceived$citation_count <- citation_count
-ggplot(df_citationsreceived, aes(x = reorder(citation_count,-n, FUN = median),y=n))+geom_boxplot(aes(fill=citation_count))
-ggplot(df_citationsreceived%>%dplyr::filter(df_citationsreceived$citation_count!='more than 500 citations'), aes(x = reorder(citation_count,-n, FUN = median),y=n))+geom_boxplot(aes(fill=citation_count))
-```
+  
+Mosaic plot - Potential, still working on it.
+May be can be used to create a parallel coordinate plot.
 ```{r}
 df_temp[,'paper_authors_count']<-factor(df_temp[,'paper_authors_count'])
 df_temp$num_authors <- forcats::fct_collapse(factor(df_temp$paper_authors_count), 
@@ -84,9 +96,16 @@ df_temp$num_pages <- forcats::fct_collapse(factor(df_temp$paper_length),
 +                                                 other_level = "5+")
 vcd::mosaic(num_pages~num_authors,df_temp,direction=c("v","h"),highlighting_fill = c("blue","lightblue","grey","pink","magenta","purple","yellow"))
 ```
+#Other things to try
+Number of coauthors of an author ~ citations received
+How geographically diverse co authorship affects citations?
 
+#Potentially look at effect of Nobel Prize on citations
+```{r}
+df_prpaper%>%select(paper_doi, paper_pub_date)%>%filter(grepl('Clifford G. Shull',df_prpaper$paper_authors))
+df_citationsreceived%>%filter(cited_doi=='10.1103/RevModPhys.67.753')
+```
 #References
 https://link.springer.com/article/10.1007/s11192-016-1889-2#:~:text=Probably%20some%20factors%20such%20as,and%20discussion%20and%20so%20on.
 Category one: “paper related factors”: quality of paper; novelty and interest of subject; characteristics of fields and study topics; methodology; document type; study design; characteristics of results and discussion; use of figures and appendix in papers; characteristics of the titles and abstracts; characteristics of references; length of paper; age of paper; early citation and speed of citation; accessibility and visibility of papers. Category two: “journal related factors”: journal impact factor; language of journal; scope of journal; form of publication. Category three: “author(s) related factors”: number of authors; author’s reputation; author’s academic rank; self-citations; international and national collaboration of authors; authors’ country; gender, age and race of authors; author’s productivity; organizational features; and funding. Probably some factors such as the quality of the paper, journal impact factor, number of authors, visibility and international cooperation are stronger predictors for citations, than authors’ gender, age and race; characteristics of results and discussion and so on.
   
-https://www.nature.com/news/papers-with-shorter-titles-get-more-citations-1.18246
