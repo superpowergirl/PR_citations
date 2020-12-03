@@ -1,9 +1,10 @@
 --- 
-title: Physical Review Citations
+title: Exploratory analysis of Physical Journal papers citation network
 author: Akanxa Padhi, Lei Liu
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
 
-# Introduction
+# Introduction  
+To uncover hidden social cues in an academic citation network, we explore citation data of physical journal papers from the APS org and draw insights from the data about the factors that affect citations received by papers. 
 
