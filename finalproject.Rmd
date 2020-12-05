@@ -21,6 +21,8 @@ Reading the physical journal paper's metadata, and looking at how many journal p
 df_prpaper = read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/phpaper_metadata_latest.csv')
 df_prpaper$paper_pub_date = as.Date(df_prpaper$paper_pub_date) #convert paper_pub_date to Date
 df_prpaper$paper_pub_year=format(df_prpaper$paper_pub_date, format = "%Y") #Get the year from the paper_pub_date
+df_prpaper$paper_authors<-as.vector(strsplit(sub(".*\\[ *(.*?) *\\].*", "\\1", df_prpaper$paper_authors),","))
+df_longer_authors<-df_prpaper %>% separate_rows(paper_authors, sep="[,]")
 df_papercount_year = df_prpaper%>%count(paper_pub_year)#This is a dataframe that gives the count of published papers each year
 df_papercount_year$paper_pub_year = as.integer(df_papercount_year$paper_pub_year) # converting year to integer
 
@@ -46,9 +48,11 @@ df_citationsreceived = df_prpapercitations%>%count(cited_doi) #This is a datafra
 ```
   
 This is the density plot for number of citations received, which follows a power law, but it is really difficult to see here as very few papers receive very large citations.
+Many  papers receive mid citations
+Very few receive very high citations
 ```{r}
-g <- ggplot(df_citationsreceived, aes(x=n)) +
-  geom_density()
+g <- ggplot(df_citationsreceived%>%dplyr::filter(n>2), aes(x=log(n))) +
+  geom_histogram(bins = 32)
 plot(g)
 ```
 We have divided the dataframe based on the citation_count and assigned them labels.
@@ -82,22 +86,26 @@ Mosaic plot - Potential, still working on it.
 May be can be used to create a parallel coordinate plot.
 ```{r}
 df_temp[,'paper_authors_count']<-factor(df_temp[,'paper_authors_count'])
-df_temp$num_authors <- forcats::fct_collapse(factor(df_temp$paper_authors_count), 
-+                                                 "0"="0", 
-+                                                 "1"="1", "2" = "2", "3"="3","4"="4","5"="5",
-+                                                 other_level = "5+")
+df_temp$num_authors <- forcats::fct_collapse(factor(df_temp$paper_authors_count), "0"="0", "1"="1", "2" = "2", "3"="3","4"="4","5"="5",other_level = "5+")
 df_temp[,'paper_journal_category']<-factor(df_temp[,'paper_journal_category'])
 ```
 ```{r}
 df_temp[,'paper_length']<-factor(df_temp[,'paper_length'])
-df_temp$num_pages <- forcats::fct_collapse(factor(df_temp$paper_length), 
-+                                                 "0"="0", 
-+                                                 "1"="1", "2" = "2", "3"="3","4"="4","5"="5",
-+                                                 other_level = "5+")
+df_temp$num_pages <- forcats::fct_collapse(factor(df_temp$paper_length), "0"="0", "1"="1", "2" = "2","3"="3","4"="4","5"="5",other_level = "5+")
 vcd::mosaic(num_pages~num_authors,df_temp,direction=c("v","h"),highlighting_fill = c("blue","lightblue","grey","pink","magenta","purple","yellow"))
 ```
 #Other things to try
 Number of coauthors of an author ~ citations received
+```{r}
+df_author_aff<-read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/paper_author_aff.csv')
+df_author_aff$author_name<-lapply(df_author_aff$author_name, gsub, pattern='-', replacement=' ')
+df_author_paper<-df_author_aff%>%dplyr::count(author_name)
+df_author_aff$citations_received_by_paper = df_citationsreceived$n[match(df_author_aff$doi,df_citationsreceived$cited_doi)]
+df_author_aff$citations_received_by_paper[is.na(df_author_aff$citations_received_by_paper)]=0
+df_author_paper$citations_received = df_author_aff%>%group_by(author_name) %>% dplyr::summarize(sum(citations_received_by_paper))%>%select(citations_received)
+```
+
+
 How geographically diverse co authorship affects citations?
 
 #Potentially look at effect of Nobel Prize on citations
