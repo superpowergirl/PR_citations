@@ -20,14 +20,30 @@ summary(citations_count)
 ```
 
 
+One of the major networking or social aspect of the academic research community is authors writing papers and citing other author's work. But as the corpus of research articles is huge, very few authors and their papers get a very high number of citations for their work. Sidney Redner in her paper, Citation Statistics from 110 Years of Physical Review - http://physics.bu.edu/~redner/pubs/pdf/PT.pdf - calls out this somewhat alarming statistical phenomenon as follows - "A somewhat depressing observation is that nearly 70% of all PR articles have been cited fewer than 10 times. Also evident is the small number of highly cited publications" 
+The histogram confirms that the data is heavily right skewed. A large number of papers receive very few citations. 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histogram(bins = 32)
-
+g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histogram(bins = 32)+
+  xlab("Number of citations received by articles - Log scale")+
+  ylab("Count of articles receiving a specific number of citations")+
+  labs(title="Histogram of citations received")
+  
 plot(g)
 ```
+In order to look at the citations received closely, we divide the dataframe based on the citation_count and assigned them labels.
+The box plot below validates our observation further, where we can clearly see that the papers that receive very high citations are sparse and are dispersed.
+  
+```{r echo = FALSE}
+cit_count <- cut(citations_count$n, breaks = c(0,25,50,75,100,500,max(citations_count$n)), labels = c('<25 citations', '25-50 citations','50-75 citations','75-100 citations','100-500 citations','more than 500 citations'))
+citations_count$cit_count <- cit_count
 
-We can see here that the data is heavily right skewed. A large number of papers receive very few citations. We then ask the question - is there any patterns associated with journal categories?
+ggplot(citations_count%>%dplyr::filter(citations_count$cit_count!='more than 500 citations'), aes(x = reorder(cit_count,-n, FUN = median),y=n))+geom_boxplot(aes(fill=cit_count))+
+  xlab("Citations received count categorized")+
+  ylab("Count of articles")+
+  theme(legend.position = "bottom" )
+```
+We then ask the question - is there any patterns associated with journal categories?
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata = read.csv("phpaper_metadata_v2.csv")
@@ -47,11 +63,9 @@ ggplot(data=total, aes(x = n)) +
 
 From the chart above, we can see that all categories are right skewed. However, the number of citations is more concentrated around zero in some categories, such as PR, PRA, PRB, PRC and PRD while less concentrated in other categories such as PRAB, PRFLUIDS and PRAER.
 
-Time series
+After exploring the data around citations received across all articles, we look at the evolution of publications and citations over time. 
 
-We are interested in how publications and citations evolve over time.
-
-First, we looked at the publications data over time to see if there exists any long term secular patterns.
+First, we look at the publications data over time to see if there exists any long term secular patterns.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 pub_yearly <- metadata %>% group_by(Year = year(paper_pub_date)) %>% summarize(paper_doi = n())
@@ -67,9 +81,9 @@ plot_ly(
 
 ```
 
-Not surprisingly, the number of publications increases as times goes by. However, the trend is not entirely upward. The number of publications declined from 2012 to 2015 and then recovered from there. 
+Not surprisingly, the number of publications has increased with time. However, the trend is not entirely upward. The number of publications declined from 2012 to 2015 and then recovered from there. 
 
-We are curious whether the number of citations will exhibit a similar pattern as the number of publications.
+We are curious whether the number of citations received by papers will exhibit a similar pattern as the number of publications.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 total$paper_pub_date <- as.Date(total$paper_pub_date)
@@ -85,7 +99,7 @@ plot_ly(
           # Hover text:
               hoverinfo = 'text',
           text = ~paste(Year)
-      ) %>% layout(title = "Number of Citatoins by Published Year", yaxis=list(title=""))
+      ) %>% layout(title = "Number of Citations by Publication Year", yaxis=list(title=""))
 
 ```
 
@@ -109,7 +123,7 @@ ggplot(monthly, aes(Year, total_n)) +
 While we see a similar pattern across all months in the chart above, instances of extremely high citations were associated with papers published in October, March and July.
 
 
-Detailed analysis for Year 2008
+In order to uncover interesting points of our data, we do a deep dive into and a detailed analysis for Year 2008
 
 We are interested in studying the physics papers published in 2008 when the number of citations reached record high.
 
@@ -127,11 +141,11 @@ recent %>% select(paper_journal_category, paper_authors_count, paper_length, n) 
                   , alpha = .5)
 ```
 
-The parallel coordinates showed us some interesting trends. First, in contrast to general belief, number of authors is negatively correlated with paper length. Second, most journal categories have author counts spread from 1 to 25 while two categories - RMP and PRSTPER have relatively fewer authors. We suspect this is because these two categories are review articles of other physics papers and therefore have few authors associated with them.
+The parallel coordinates plot shows us some interesting trends. First, in contrast to general belief, number of authors is negatively correlated with paper length. Second, most journal categories have author counts spread from 1 to 25 while two categories - RMP and PRSTPER have relatively fewer authors. We suspect this is because these two categories are review articles of other physics papers and therefore have few authors associated with them.
 
-A few outliers jumped out from the graph. For instance, one paper in RMP had the highest paper length but was written by fewer than 5 people and received very few citations. Moreover, the paper that received the highest number of citations and relatively high paper length had fewer than 5 authors.
+A few outliers jump out from the graph. For instance, one paper in RMP has the highest paper length but was written by fewer than 5 people and received very few citations. Moreover, the paper that received the highest number of citations and relatively high paper length has fewer than 5 authors.
 
-Furthermore, we would like to see how the number of citations varies across journal categories for the publications in 2008. We focused on the following categories that have meaningful number of total citations in 2008: PRA, PRB, PRC, PRD, PRE and PRL.
+Furthermore, we would like to see how the number of citations varies across journal categories for the publications in 2008. We focus on the following categories that have meaningful number of total citations in 2008: PRA, PRB, PRC, PRD, PRE and PRL.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=7}
 recent_mo <- as.data.frame(recent)
@@ -143,4 +157,132 @@ recent_mo$n <- cut(recent_mo$n, breaks = c(-Inf, 6, 15, Inf), labels = c('<6', '
 mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of Citations by Journal Category")
 ```
 
-The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE.
+The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE. 
+
+All in all we were able to see some interesting trends in 2008.
+
+Lastly, we do a deep dive on some factors that contribute to the citations received by papers across all the years in our dataset (1893-2019)
+
+We begin by looking at the attributes of the paper - length of the paper, and length of the title of the paper. 
+1. Length of the title of a paper - An article in the Nature magazine claims that papers with shorter titles get more citations. We wanted to see if this was applicable to articles/papers published in the physical review journal. And we do see a decrease in number of citations as the length of the title of the paper becomes longer as shown by the scatter plot below.
+
+Note: For this calculation, we remove the papers where titles have a math function in them. This is because the title length includes html tags in them making the title length longer than the actual title.  
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+metadata_titlecleanup <- metadata[!grepl("<math",metadata$paper_title),]
+metadata_titlecleanup$paper_title_length <-sapply(strsplit(metadata_titlecleanup$paper_title, " "), length)
+metadata_titlecleanup$n_citations=citations_count$n[match(metadata_titlecleanup$paper_doi,citations_count$cited_doi)]
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+ggplot(metadata_titlecleanup, aes(x=paper_title_length, y = n_citations))+
+  stat_summary(fun = "mean", geom="point")+
+  xlab("Length of the title of an article ")+
+  ylab("Number of citations received by an article")+
+  labs(title="Effect of title length on citations received")
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+metadata[,'paper_authors_count']<-factor(metadata[,'paper_authors_count'])
+metadata<-metadata%>%filter(paper_authors_count!=0)
+metadata$num_authors <- forcats::fct_collapse(factor(metadata$paper_authors_count), "1"="1", "2" = "2", "3"="3","4"="4","5"="5",other_level = "5+")
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+metadata$n_citations=citations_count$n[match(metadata$paper_doi,citations_count$cited_doi)]
+num_citations <- cut(metadata$n_citations, breaks = c(0,25,50,75,100,500,10763), labels = c('<25', '25-50','50-75','75-100','100-500','>500'))
+metadata$num_citations <- num_citations
+metadata <- metadata %>% mutate(num_citations = fct_rev(num_citations))
+```  
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+metadata_less_than_500cit <- metadata%>%filter(n_citations <500)
+```
+
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+df2 <- aggregate(x=metadata_less_than_500cit$n_citations, list(metadata_less_than_500cit$paper_length),FUN="mean")
+names(df2)<-c("paper_length","mean_citations")
+```
+
+2. Length of the paper - A study by Tahatman, Afshar, Ahamdzadeh on papers published WoS, Scopus, PubMed and Medline believes that longer papers get more citations because they contain more information. (Factors affecting number of citations: a comprehensive review of the literature). We see that phenomenon in physical review journal papers as well as shown in the scatter diagram below.
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+g_citation_length<- ggplot(metadata_less_than_500cit, aes(x=paper_length,y=n_citations))
+g_citation_length<-g_citation_length + stat_summary(fun = "mean", geom="point")
+g_citation_length<-g_citation_length+geom_smooth(data = df2, aes(x=paper_length, y = mean_citations), alpha=0.5 )
+g_citation_length + 
+  xlab("Length of journal article") + 
+  ylab("Average citations received by the article")+
+  labs(title="Citations received vs Article length")
+```
+
+Now we try to look at the people or social aspect of citations. We want to see what social factors, if any, play a role in increasing or decreasing citations received.
+First, we look at whether or not the number of authors of an article has an effect on the number of citations received by a paper. The scatter diagram below shows the average number of citations received by articles that have a given number of authors. 
+As we saw in the parallel coordinates plot for 2008 papers, we do suspect a slight negative correlation between citations received by a paper and its number of authors, overall in our dataset.
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+citations_count$n_authors=metadata$paper_authors_count[match(citations_count$cited_doi,metadata$paper_doi)]
+ggplot(citations_count, aes(x=factor(n_authors), y = n))+stat_summary(fun = "mean", geom="point")+
+  xlab("Number of authors of an article")+
+  ylab("Average number of citations received by the article")
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_metadata<-read.csv('paper_author_aff.csv')
+author_metadata$author_name<-str_replace_all(str_replace_all(author_metadata$author_name, "[^[:alnum:]]", " "),pattern=" ", repl="")
+```
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor<-author_metadata%>%dplyr::count(author_name)
+author_metadata$citations_received_by_paper = citations_count$n[match(author_metadata$doi,citations_count$cited_doi)]
+```
+
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_metadata$citations_received_by_paper[is.na(author_metadata$citations_received_by_paper)]=0
+```
+
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_metadata$n_coauthors = as.numeric(as.character(metadata$paper_authors_count[match(author_metadata$doi,metadata$paper_doi)]))-1
+```
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_metadata$n_coauthors[is.na(author_metadata$n_coauthors)]=0
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor$citations_received <- author_metadata%>%group_by(author_name) %>% dplyr::summarize(citations_received=sum(citations_received_by_paper))%>%select(citations_received)
+```
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor$number_coauthors = author_metadata%>%group_by(author_name) %>% dplyr::summarize(number_coauthors=sum(n_coauthors))%>%select(number_coauthors)
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor$avg_coauthors <- as.numeric(author_cit_coauthor$number_coauthors$number_coauthors)/author_cit_coauthor$n
+
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor$avg_citations <- as.numeric(author_cit_coauthor$citations_received$citations_received)/author_cit_coauthor$n
+```
+
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+author_cit_coauthor$avg_coauthors <- as.integer(author_cit_coauthor$avg_coauthors)
+author_cit_coauthor$avg_citations <- as.integer(author_cit_coauthor$avg_citations)
+```
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+df3 <- aggregate(x=author_cit_coauthor$citations_received$citations_received, list(author_cit_coauthor$avg_coauthors),FUN="median")
+names(df3)<-c("avg_coauthors","median_citations")
+```
+
+The above result was a little contrary to our belief. So we look at the effect of number of co-authors of an author and how does that help authors receive citations for their articles/papers. 
+We see that an increase in collaboration does play a role in increasing citations, but the effect does not hold beyond a certain number of coauthors. First, the increasing trend of citations  as coauthors increase from 0-15 could be due to the fact that co-authored papers are presented in more scientific networks such as conferences, seminars, etc. which boosts their citations.  
+We do see a decreasing trend in citations beyond 15 co-authors.
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+g_citation_coauthor<- ggplot(author_cit_coauthor, aes(x=avg_coauthors,y=citations_received$citations_received))
+g_citation_coauthor<-g_citation_coauthor+ stat_summary(fun = "median", geom="point")
+g_citation_coauthor<-g_citation_coauthor+geom_smooth(data = df3, aes(x=avg_coauthors, y = median_citations), alpha=0.5 )
+g_citation_coauthor + 
+  xlab("Average coauthors of an author") + 
+  ylab("Median citations received by the author")+
+  labs(title="Median Citations received vs number of coauthors")
+```
+
+Thus we are able to see some interesting dynamics between the characteristics of papers  and the citations received by papers. We also see how co-authorship plays a role in boosting citations upto a certain degree of the number of co-authors.
