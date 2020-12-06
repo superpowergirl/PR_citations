@@ -38,7 +38,7 @@ knitr::include_graphics('./datatransformation_python/citationpairs_csv.png')
 
 2) Article metadata: This data set consists of the basic metadata of all APS journal articles. This data is in json format, one json file for each article. The metadata provided includes the following fields: DOI, journal, volume, issue, first page and last page OR article id and number of pages, title, authors, affiliations, publication history, PACS codes, table of contents heading, article type, and copyright information.  
 ```{r echo = FALSE, out.width='100%'}
-knitr::include_graphics('/Users/akanxa/Desktop/prmetadata_example.png')
+knitr::include_graphics('./datatransformation_python/prmetadata_example.png')
 ```
 
 
