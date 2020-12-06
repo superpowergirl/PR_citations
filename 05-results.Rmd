@@ -1,1 +1,158 @@
 # Results
+
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library (tidyverse)
+library(lubridate)
+library(parcoords)
+library(plotly)
+library(vcd)
+
+citations = read.csv("citations.csv")
+
+citations_count = citations%>%count(cited_doi)
+
+summary(citations_count)
+
+ggplot(data=citations_count, aes(x = n)) +
+  geom_histogram(binwidth = 500) +
+  ggtitle("Number of Citations")
+
+```
+
+It's hard to see the pattern, so we reduced the number of citations to be less than 50.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+main <- subset(citations_count,n < 50)
+
+ggplot(data=main, aes(x = n)) +
+  geom_histogram(binwidth = 5) +
+  ggtitle("Number of Citations (n < 50)")
+
+```
+
+We can see here that the data is heavily right skewed. A large number of papers receive very few citations. We then ask the question - is there any patterns associated with journal categories?
+
+```{r echo=FALSE}
+metadata = read.csv("phpaper_metadata_v2.csv")
+
+metadata$paper_pub_date <- as.Date(metadata$paper_pub_date)
+
+total = merge(x = citations_count, y = metadata, by.x = "cited_doi", by.y = "paper_doi")
+
+total$paper_pub_date <- as.Date(total$paper_pub_date)
+
+ggplot(data=total, aes(x = n)) +
+  geom_histogram() +
+  ggtitle("Number of Citations by Category") +
+  facet_wrap(~paper_journal_category, scales="free")
+
+```
+
+From the chart above, we can see that all categories are right skewed. However, the number of citations is more concentrated around zero in some categories, such as PR, PRA, PRB, PRC and PRD while less concentrated in other categories such as PRAB, PRFLUIDS and PRAER.
+
+Time series
+
+We are interested in how publications and citations evolve over time.
+
+First, we looked at the publications data over time to see if there exists any long term secular patterns.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+pub_yearly <- metadata %>% group_by(Year = year(paper_pub_date)) %>% summarize(paper_doi = n())
+
+plot_ly(
+          pub_yearly, x = ~Year, y = ~paper_doi,
+          type = 'scatter',
+          mode = 'lines+markers',
+          # Hover text:
+              hoverinfo = 'text',
+          text = ~paste(Year)
+      ) %>% layout(title = "Number of Publications by Year")
+
+```
+
+Not surprisingly, the number of publications increases as times goes by. However, the trend is not entirely upward. The number of publications declined from 2012 to 2015 and then recovered from there. 
+
+We are curious whether the number of citations will exhibit a similar pattern as the number of publications.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+total$paper_pub_date <- as.Date(total$paper_pub_date)
+
+yearly <- total %>% 
+  group_by(Year = year(paper_pub_date))%>%
+  summarize(total_n = sum(n))
+
+#ggplot(yearly, aes(Year, total_n)) +
+  #geom_line() +
+  #geom_point() +
+  #geom_label(data=yearly %>% filter(Year == "2008"),
+             #aes(label="2008")) +
+  #ylab("") +
+  #ggtitle("Number of Citatoins by Published Year")
+
+plot_ly(
+          yearly, x = ~Year, y = ~total_n,
+          type = 'scatter',
+          mode = 'lines+markers',
+          # Hover text:
+              hoverinfo = 'text',
+          text = ~paste(Year)
+      ) %>% layout(title = "Number of Citatoins by Published Year")
+
+```
+
+Based on our data (1893-2019), the number of citations generally went up over time and reached the peak in 2008, which means that paper published in 2008 received the highest number of citations. We think it makes sense to see an inflection point since paper published too long ago might be out of date while paper published in recent years have not had enough time to be cited by other papers. It is interesting to see that the year 2008 is the peak, indicating that on average it takes about 12 years for a paper to receive the highest number of citations.
+
+To further explore, we faceted on months from January to December to see if there exists any seasonal patterns.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=10}
+monthly <- total %>% 
+  group_by(Year = year(paper_pub_date), Month = month(paper_pub_date)) %>% 
+  summarize(total_n = sum(n))
+
+ggplot(monthly, aes(Year, total_n)) +
+  geom_line() +
+  facet_grid(~Month) +
+  ylab("") +
+  ggtitle("Number of Citations by Published Month")
+
+```
+
+While we see a similar pattern across all months in the chart above, instances of extremely high citations were associated with papers published in October, March and July.
+
+Categorical data analysis
+
+We are interested in studying the papers published in 2008 when number of citations reached record high.
+
+To start with, we used interactive parallel coordinates to identify outliers and the relationship between different categorical variables, such as journal categories, paper length, number of authors and number of citations.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+recent <- total %>% select(paper_pub_date, paper_journal_category, paper_authors_count, paper_length, n) %>% filter(paper_pub_date >= as.Date("2008-01-01") & paper_pub_date <= as.Date("2008-12-31"))
+
+recent %>% select(paper_journal_category, paper_authors_count, paper_length, n) %>%
+          parcoords(
+                  rownames = F
+                  , brushMode = "1D-axes"
+                  , reorderable = T
+                  , queue = T
+                  , alpha = .5)
+```
+
+The parallel coordinates showed us some interesting trends. First, in contrast to general belief, number of authors is negatively correlated with paper length. Second, most journal categories have author counts spread from 1 to 25 while two categories - RMP and PRSTPER have relatively fewer authors.
+
+A few outliers jumped out from the graph. For instance, one paper in RMP had the highest paper length but was written by fewer than 5 people and received very few citations. Moreover, the paper that received the highest number of citations and relatively high paper length had fewer than 5 authors.
+
+Furthermore, we would like to see for the publications in 2008, how the number of citations varies across journal categories.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=13}
+recent_mo <- as.data.frame(recent)
+
+recent_mo$n <- cut(recent_mo$n, breaks = c(-Inf, 6, 15, Inf), labels = c('low', 'medium','high'), right = FALSE)
+
+mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of Citations by Journal Category")
+
+```
+
