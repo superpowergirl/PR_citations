@@ -12,7 +12,7 @@ Each article has a corresponding json file that has its metadata. We parse throu
 As an example, let us look at one row of the dataframe corresponding to one article. Please refer to the Data Sources section for a representation of the metadata json file for a particular article.
 
 ```{r echo = FALSE, out.width='100%'}
-knitr::include_graphics('/Users/akanxa/Desktop/df_metadata_row.png')
+knitr::include_graphics('./datatransformation_python/df_metadata_row.png')
 
 ```  
 While generating this dataframe, we ensure that we take care of the following - we filter out the 'author type' that is not 'Person' because there are instances where a survey group organization might be an 'author'. We match the affiliation Ids of authors to the names corresponding to those Ids and add them in the paper_affiliations column.  
@@ -24,7 +24,7 @@ The number of rows discarded is small and only x% of the rows were excluded.
 
 A sample extract of the final dataframe is shown below. In this sample, we have the all the authors of a specific paper as separate row of the dataframe-
 ```{r echo = FALSE, out.width='100%'}
-knitr::include_graphics('/Users/akanxa/Desktop/df_authoraff_sample.png')
+knitr::include_graphics('./datatransformation_python/df_authoraff_sample.png')
 
 ```  
 

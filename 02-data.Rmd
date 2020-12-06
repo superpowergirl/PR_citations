@@ -28,10 +28,11 @@ Below is a description of our data source from the APS data set website - https:
 The data source has information about more than 450,000 (656,622 to be exact) articles spanning the period between 1893 and 2019.  Two data sets that were made available to us, and that we have worked with are as follows -
 
 1) Citing article pairs: This data set consists of pairs of APS articles that cite each other. For instance, if article A cites article B, there will be an entry in the data set consisting of the pair of DOIs for A and B. This data set is formatted as a comma-separated values (CSV) file consisting of the DOI pairs, one pair per line.  
-Note that this data only consists of APS articles that cite other APS articles. There could be articles that they cite outside of APS, but we do not have the data for it in our dataset. So the citations given and citations received will be a lower bound of the actual numbers.
+Note that this data only consists of APS articles that cite other APS articles. There could be articles that they cite outside of APS, but we do not have the data for it in our dataset. So the citations given and citations received will be a lower bound of the actual numbers.  
+
 
 ```{r echo = FALSE, out.width='100%'}
-knitr::include_graphics('/Users/akanxa/Desktop/citationpairs_csv.png')
+knitr::include_graphics('./datatransformation_python/citationpairs_csv.png')
 
 ```
 
