@@ -13,6 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(dplyr)
 library(ggplot2)
+library(tidyr)
+library(stringr)
+library(forcats)
 ```
 
 #Code 
@@ -22,19 +25,19 @@ df_prpaper = read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/phpaper_
 df_prpaper$paper_pub_date = as.Date(df_prpaper$paper_pub_date) #convert paper_pub_date to Date
 df_prpaper$paper_pub_year=format(df_prpaper$paper_pub_date, format = "%Y") #Get the year from the paper_pub_date
 df_prpaper$paper_authors<-as.vector(strsplit(sub(".*\\[ *(.*?) *\\].*", "\\1", df_prpaper$paper_authors),","))
-df_longer_authors<-df_prpaper %>% separate_rows(paper_authors, sep="[,]")
-df_papercount_year = df_prpaper%>%count(paper_pub_year)#This is a dataframe that gives the count of published papers each year
-df_papercount_year$paper_pub_year = as.integer(df_papercount_year$paper_pub_year) # converting year to integer
+#df_longer_authors<-df_prpaper %>% separate_rows(paper_authors, sep="[,]")
+#df_papercount_year = df_prpaper%>%count(paper_pub_year)#This is a dataframe that gives the count of published papers each year
+#df_papercount_year$paper_pub_year = as.integer(df_papercount_year$paper_pub_year) # converting year to integer
 
 ```
   
 This is the plot for journal papers published through the years, faceted by decade
 ```{r}
-g_pub_time <- ggplot(df_papercount_year, aes(x=paper_pub_year, y = n))+
-  geom_point()
+#g_pub_time <- ggplot(df_papercount_year, aes(x=paper_pub_year, y = n))+
+  #geom_point()
 
 #papers published throughout the decades - A time series
-g_pub_time + facet_wrap(.~(df_papercount_year$paper_pub_year - (df_papercount_year$paper_pub_year %% 10)), scales = 'free', ncol=3, nrow = 6)
+#g_pub_time + facet_wrap(.~(df_papercount_year$paper_pub_year - (df_papercount_year$paper_pub_year %% 10)), scales = 'free', ncol=3, nrow = 6)
 ```
   
 Reading the physical journal paper citation data
@@ -68,7 +71,7 @@ ggplot(df_citationsreceived%>%dplyr::filter(df_citationsreceived$citation_count!
 This produces a graph comparing average number of citations received by a paper and the number of authors of the paper.
 ```{r}
 df_citationsreceived$n_authors=df_prpaper$paper_authors_count[match(df_citationsreceived$cited_doi,df_prpaper$paper_doi)]
-ggplot(df_citationsreceived, aes(x=factor(n_authors), y = n))+stat_summary(fun.y = "mean", geom="point")+theme_light()
+ggplot(df_citationsreceived, aes(x=factor(n_authors), y = n))+stat_summary(fun = "mean", geom="point")+theme_light()
 ```
 
 
@@ -79,34 +82,142 @@ We do some cleaning here to remove the papers where titles have a math function 
 df_temp <- df_prpaper[!grepl("<math",df_prpaper$paper_title),]
 df_temp$paper_title_length <-sapply(strsplit(df_temp$paper_title, " "), length)
 df_temp$n_citations=df_citationsreceived$n[match(df_temp$paper_doi,df_citationsreceived$cited_doi)]
+df_temp<-df_temp%>%filter(n_citations!='NA')
 ggplot(df_temp, aes(x=paper_title_length, y = n_citations))+stat_summary(fun.y = "mean", geom="point")+theme_light()
 ```
-  
-Mosaic plot - Potential, still working on it.
-May be can be used to create a parallel coordinate plot.
+
 ```{r}
 df_temp[,'paper_authors_count']<-factor(df_temp[,'paper_authors_count'])
-df_temp$num_authors <- forcats::fct_collapse(factor(df_temp$paper_authors_count), "0"="0", "1"="1", "2" = "2", "3"="3","4"="4","5"="5",other_level = "5+")
+#df_temp[complete.cases(df_temp[ , 12]),]
+df_temp<-df_temp%>%filter(paper_authors_count!=0)
+df_temp$num_authors <- forcats::fct_collapse(factor(df_temp$paper_authors_count), "1"="1", "2" = "2", "3"="3","4"="4","5"="5",other_level = "5+")
 df_temp[,'paper_journal_category']<-factor(df_temp[,'paper_journal_category'])
 ```
+
+
 ```{r}
-df_temp[,'paper_length']<-factor(df_temp[,'paper_length'])
-df_temp$num_pages <- forcats::fct_collapse(factor(df_temp$paper_length), "0"="0", "1"="1", "2" = "2","3"="3","4"="4","5"="5",other_level = "5+")
-vcd::mosaic(num_pages~num_authors,df_temp,direction=c("v","h"),highlighting_fill = c("blue","lightblue","grey","pink","magenta","purple","yellow"))
+#df_temp[,'n_citations']<-factor(df_temp[,'n_citations'])
+num_citations <- cut(df_temp$n_citations, breaks = c(0,25,50,75,100,500,10763), labels = c('<25', '25-50','50-75','75-100','100-500','>500'))
+df_temp$num_citations <- num_citations
+df_temp <- df_temp %>% mutate(num_citations = fct_rev(num_citations))
+```  
+
+```{r}
+df_temp_less_than_500 <- df_temp%>%filter(n_citations <500)
+```
+
+
+```{r}
+df2 <- aggregate(x=df_temp_less_than_500$n_citations, list(df_temp_less_than_500$paper_length),FUN="mean")
+names(df2)<-c("paper_length","mean_citations")
+```
+
+
+```{r}
+g_citation_length<- ggplot(df_temp_less_than_500, aes(x=paper_length,y=n_citations))
+g_citation_length<-g_citation_length + stat_summary(fun = "mean", geom="point")
+g_citation_length<-g_citation_length+geom_smooth(data = df2, aes(x=paper_length, y = mean_citations), alpha=0.5 )
+g_citation_length + 
+  xlab("Length of journal article") + 
+  ylab("Average citations received by the article")+
+  labs(title="Citations received vs Article length")
+```
+```{r}
+ggplot(df_temp%>%filter(n_citations <500), aes(x=paper_authors_count,y=paper_length))+ 
+  stat_summary(fun = "mean", geom="point")+
+  stat_summary(fun = "mean", geom="smooth", method="loess")
+```
+  
+If we look at the effect of both the number of authors and number of pages of an article on the number of citations received by an article, some interesting observations can be made.  
+First of all, it confirms that very few articles receive very high citations. Articles which are 3 pages long show a trend of increasing citations received as the number of authors increases. We do not see any pattern in articles that are lonnger than 3 pages. This might be because 
+```{r}
+vcd::mosaic(num_citations~num_pages+num_authors,df_temp%>%filter(num_pages %in% c("3","3+")) ,direction=c("v","v","h"),highlighting_fill = c("grey","lightblue","pink","purple","magenta","blue"))
 ```
 #Other things to try
 Number of coauthors of an author ~ citations received
 ```{r}
 df_author_aff<-read.csv('/Users/akanxa/PycharmProjects/PhysicalReviewData/paper_author_aff.csv')
-df_author_aff$author_name<-lapply(df_author_aff$author_name, gsub, pattern='-', replacement=' ')
-df_author_paper<-df_author_aff%>%dplyr::count(author_name)
-df_author_aff$citations_received_by_paper = df_citationsreceived$n[match(df_author_aff$doi,df_citationsreceived$cited_doi)]
-df_author_aff$citations_received_by_paper[is.na(df_author_aff$citations_received_by_paper)]=0
-df_author_paper$citations_received = df_author_aff%>%group_by(author_name) %>% dplyr::summarize(sum(citations_received_by_paper))%>%select(citations_received)
+#df_author_aff$author_name<-lapply(df_author_aff$author_name, gsub, pattern='-', replacement=' ')
+df_author_aff$author_name<-str_replace_all(str_replace_all(df_author_aff$author_name, "[^[:alnum:]]", " "),pattern=" ", repl="")
 ```
 
 
-How geographically diverse co authorship affects citations?
+```{r}
+df_author_paper<-df_author_aff%>%dplyr::count(author_name)
+#df_author_paper$author_name<-str_replace_all(str_replace_all(df_author_paper$author_name, "[^[:alnum:]]", " "),pattern=" ", repl="")
+
+df_author_aff$citations_received_by_paper = df_citationsreceived$n[match(df_author_aff$doi,df_citationsreceived$cited_doi)]
+df_author_aff$citations_received_by_paper[is.na(df_author_aff$citations_received_by_paper)]=0
+```
+
+
+```{r}
+df_author_aff$n_coauthors <- df_prpaper$paper_authors_count[match(df_author_aff$doi,df_prpaper$paper_doi)] -1
+df_author_aff$n_coauthors[is.na(df_author_aff$n_coauthors)]=0
+```
+
+
+```{r}
+df_author_paper$citations_received <- df_author_aff%>%group_by(author_name) %>% dplyr::summarize(citations_received=sum(citations_received_by_paper))%>%select(citations_received)
+```
+
+
+```{r}
+
+df_author_paper$number_coauthors = df_author_aff%>%group_by(author_name) %>% dplyr::summarize(number_coauthors=sum(n_coauthors))%>%select(number_coauthors)
+```
+```{r}
+df_author_paper$avg_coauthors <- as.numeric(df_author_paper$number_coauthors$number_coauthors)/df_author_paper$n
+```
+
+```{r}
+df_author_paper$avg_coauthors <- as.integer(df_author_paper$avg_coauthors)
+
+```
+
+```{r}
+df_author_paper$avg_citations <- as.numeric(df_author_paper$citations_received$citations_received)/df_author_paper$n
+```
+
+```{r}
+df_author_paper$avg_citations <- as.integer(df_author_paper$avg_citations)
+
+```
+```{r}
+ggplot(df_author_paper, aes(x=avg_coauthors,y=citations_received$citations_received))+
+  #geom_point()+
+  stat_summary(fun ="median", geom="smooth")+
+  stat_summary(fun ="median", geom="point")
+```
+
+```{r}
+num_co_authors_level <- cut(df_author_paper$avg_coauthors, breaks = c(0,25,50,75,100,500,10763), labels = c('<25', '25-50','50-75','75-100','100-500','>500'))
+df_author_paper$level_coauthors <- forcats::fct_collapse(factor(df_author_paper$number_coauthors$number_coauthors), "0"="0", "1"="1", "2" = "2", "3"="3","4"="4","5"="5","6"="6","7"="7","8"="8","9"="9","10"="10",other_level = "10+")
+```
+
+
+```{r}
+#ggplot(df_author_paper, aes(x=as.numeric(number_coauthors$number_coauthors)/n,y=citations_received$citations_received/n))+
+  #stat_summary(fun = "mean", geom="point")+
+  #xlab('Avg number of coauthors of an author across all papers')+ 
+  #ylab('Average citation received across all papers') + 
+  #labs(title ='Citations received vs number of co-authors')
+
+```
+```{r}
+num_citations_levels <- cut(df_author_paper$n_citations$citations_received, breaks = c(0,25,50,75,100,500,10763), labels = c('<25', '25-50','50-75','75-100','100-500','>500'))
+df_author_paper$num_citations_levels <- num_citations_levels
+df_author_paper<- df_author_paper %>% mutate(num_citations_levels = fct_rev(num_citations_levels))
+```
+
+
+```{r}
+vcd::mosaic(num_citations_levels~level_coauthors,df_author_paper ,direction=c("v"),highlighting_fill = c("grey","lightblue","pink","purple","magenta","blue"))
+
+```
+
+
+How geographically diverse co authorship affects citations?y
 
 #Potentially look at effect of Nobel Prize on citations
 ```{r}

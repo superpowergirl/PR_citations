@@ -1,1 +1,4 @@
 # Missing values
+Number of records -
+We have author and author affiliation missing for some of the papers. We are excluding them from our analysis.
+Where do we need those values and how we handle?
