@@ -17,26 +17,19 @@ citations_count = citations%>%count(cited_doi)
 
 summary(citations_count)
 
-ggplot(data=citations_count, aes(x = n)) +
-  geom_histogram(binwidth = 500) +
-  ggtitle("Number of Citations")
-
 ```
 
-It's hard to see the pattern, so we reduced the number of citations to be less than 50.
+
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-main <- subset(citations_count,n < 50)
+g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histogram(bins = 32)
 
-ggplot(data=main, aes(x = n)) +
-  geom_histogram(binwidth = 5) +
-  ggtitle("Number of Citations (n < 50)")
-
+plot(g)
 ```
 
 We can see here that the data is heavily right skewed. A large number of papers receive very few citations. We then ask the question - is there any patterns associated with journal categories?
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata = read.csv("phpaper_metadata_v2.csv")
 
 metadata$paper_pub_date <- as.Date(metadata$paper_pub_date)
@@ -70,7 +63,7 @@ plot_ly(
           # Hover text:
               hoverinfo = 'text',
           text = ~paste(Year)
-      ) %>% layout(title = "Number of Publications by Year")
+      ) %>% layout(title = "Number of Publications by Year", yaxis=list(title=""))
 
 ```
 
@@ -85,14 +78,6 @@ yearly <- total %>%
   group_by(Year = year(paper_pub_date))%>%
   summarize(total_n = sum(n))
 
-#ggplot(yearly, aes(Year, total_n)) +
-  #geom_line() +
-  #geom_point() +
-  #geom_label(data=yearly %>% filter(Year == "2008"),
-             #aes(label="2008")) +
-  #ylab("") +
-  #ggtitle("Number of Citatoins by Published Year")
-
 plot_ly(
           yearly, x = ~Year, y = ~total_n,
           type = 'scatter',
@@ -100,7 +85,7 @@ plot_ly(
           # Hover text:
               hoverinfo = 'text',
           text = ~paste(Year)
-      ) %>% layout(title = "Number of Citatoins by Published Year")
+      ) %>% layout(title = "Number of Citatoins by Published Year", yaxis=list(title=""))
 
 ```
 
@@ -123,9 +108,10 @@ ggplot(monthly, aes(Year, total_n)) +
 
 While we see a similar pattern across all months in the chart above, instances of extremely high citations were associated with papers published in October, March and July.
 
-Categorical data analysis
 
-We are interested in studying the papers published in 2008 when number of citations reached record high.
+Detailed analysis for Year 2008
+
+We are interested in studying the physics papers published in 2008 when the number of citations reached record high.
 
 To start with, we used interactive parallel coordinates to identify outliers and the relationship between different categorical variables, such as journal categories, paper length, number of authors and number of citations.
 
@@ -141,18 +127,20 @@ recent %>% select(paper_journal_category, paper_authors_count, paper_length, n) 
                   , alpha = .5)
 ```
 
-The parallel coordinates showed us some interesting trends. First, in contrast to general belief, number of authors is negatively correlated with paper length. Second, most journal categories have author counts spread from 1 to 25 while two categories - RMP and PRSTPER have relatively fewer authors.
+The parallel coordinates showed us some interesting trends. First, in contrast to general belief, number of authors is negatively correlated with paper length. Second, most journal categories have author counts spread from 1 to 25 while two categories - RMP and PRSTPER have relatively fewer authors. We suspect this is because these two categories are review articles of other physics papers and therefore have few authors associated with them.
 
 A few outliers jumped out from the graph. For instance, one paper in RMP had the highest paper length but was written by fewer than 5 people and received very few citations. Moreover, the paper that received the highest number of citations and relatively high paper length had fewer than 5 authors.
 
-Furthermore, we would like to see for the publications in 2008, how the number of citations varies across journal categories.
+Furthermore, we would like to see how the number of citations varies across journal categories for the publications in 2008. We focused on the following categories that have meaningful number of total citations in 2008: PRA, PRB, PRC, PRD, PRE and PRL.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=13}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=7}
 recent_mo <- as.data.frame(recent)
 
-recent_mo$n <- cut(recent_mo$n, breaks = c(-Inf, 6, 15, Inf), labels = c('low', 'medium','high'), right = FALSE)
+recent_mo <- filter(recent_mo,paper_journal_category %in% c('PRA','PRB','PRC','PRD','PRE','PRL'))
+
+recent_mo$n <- cut(recent_mo$n, breaks = c(-Inf, 6, 15, Inf), labels = c('<6', '[6,15)','>=15'), right = FALSE) #left closed
 
 mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of Citations by Journal Category")
-
 ```
 
+The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE.
