@@ -24,7 +24,7 @@
 <meta name="author" content="Akanxa Padhi, Lei Liu" />
 
 
-<meta name="date" content="2020-11-22" />
+<meta name="date" content="2020-12-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,15 @@
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="libs/parallel-coordinates-2.1.8/parcoords.css" rel="stylesheet" />
+<script src="libs/parcoords-binding-1.0.0/parcoords.js"></script>
 
 
 
@@ -100,6 +109,37 @@
             <section class="normal" id="section-">
 <div id="data-sources" class="section level1">
 <h1><span class="header-section-number">Chapter 2</span> Data sources</h1>
+<p>We analyze citation data about Physical Review Journal articles published by the American Physical Society (APS). APS has made available to researchers data based on their publications for use in research about networks and the social aspects of science.</p>
+<p>Physical Review Journals are divided into various categories based on the field of physics and type of articles published in the journals. More detail can be found here - <a href="https://journals.aps.org/about" class="uri">https://journals.aps.org/about</a><br />
+Here is a brief overview of the categories -<br />
+* PRL (Physical Review Letters) – weekly coverage of major advances in physics and cross-disciplinary developments
+* PRX (Physical Review X) – online-only, open access, peer-reviewed. Publishes exceptional original research papers from all areas of pure,applied and interdisciplinary physics.
+* PRA (Physical Review A) – atomic, molecular, and optical physics and quantum information
+* PRB (Physical Review B) – condensed matter and material physics
+* PRAB – Physical Review Accelerator and Beams
+* PRC (Physical Review C) – Nuclear Physics
+* PRD (Physical Review D) – particles, fields, gravitation, and cosmology
+* PRE – statistical, nonlinear, biological, and soft matter physics
+* PRApplied – all aspects of experimental and theoretical applications of physics
+* PRFluids – online-only, fundamental understanding of fluids
+* PRMaterials – research on materials
+* PRPER - Physics Education Research
+* PRRESEARCH – all research topics of interest to the physics community
+* PRSTAB
+* PRSTPER
+* RMP – Reviews of Modern Physics – indepth review articles</p>
+<p>The datasource is not publicly available for download. We requested access to it by filling out a web inquiry form, and data was made available to us for download in the form of downloadable links.</p>
+<p>Below is a description of our data source from the APS data set website - <a href="https://journals.aps.org/datasets" class="uri">https://journals.aps.org/datasets</a><br />
+The data source has information about more than 450,000 (656,622 to be exact) articles spanning the period between 1893 and 2019. Two data sets that were made available to us, and that we have worked with are as follows -</p>
+<ol style="list-style-type: decimal">
+<li>Citing article pairs: This data set consists of pairs of APS articles that cite each other. For instance, if article A cites article B, there will be an entry in the data set consisting of the pair of DOIs for A and B. This data set is formatted as a comma-separated values (CSV) file consisting of the DOI pairs, one pair per line.<br />
+Note that this data only consists of APS articles that cite other APS articles. There could be articles that they cite outside of APS, but we do not have the data for it in our dataset. So the citations given and citations received will be a lower bound of the actual numbers.</li>
+</ol>
+<p><img src="datatransformation_python/citationpairs_csv.png" width="100%" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Article metadata: This data set consists of the basic metadata of all APS journal articles. This data is in json format, one json file for each article. The metadata provided includes the following fields: DOI, journal, volume, issue, first page and last page OR article id and number of pages, title, authors, affiliations, publication history, PACS codes, table of contents heading, article type, and copyright information.<br />
+<img src="datatransformation_python/prmetadata_example.png" width="100%" /></li>
+</ol>
 
 </div>
             </section>

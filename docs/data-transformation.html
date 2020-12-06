@@ -24,7 +24,7 @@
 <meta name="author" content="Akanxa Padhi, Lei Liu" />
 
 
-<meta name="date" content="2020-11-22" />
+<meta name="date" content="2020-12-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,15 @@
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="libs/parallel-coordinates-2.1.8/parcoords.css" rel="stylesheet" />
+<script src="libs/parcoords-binding-1.0.0/parcoords.js"></script>
 
 
 
@@ -100,6 +109,26 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
+<p>Data clean up and transformation was the most challenging part of our project, given the complex nature and size of the data set. We provide a summary here. There are additional steps we have performed that we have excluded here for conciseness. We can provide details if required. We have the complete code of our transformation in python and R in our repository.</p>
+<p>Transformation in Python:
+The bulk of the data cleanup and transformation of our raw metadata was done using Python. The code is in our repository here - <a href="https://github.com/superpowergirl/PR_citations/tree/main/datatransformation_python" class="uri">https://github.com/superpowergirl/PR_citations/tree/main/datatransformation_python</a><br />
+Below is a brief of how we transform the json metadata into two dataframes in python. We then converted these dataframes into two comma separated values (csv) files and imported them into R for further cleanup and transformation as applicable for our analysis.</p>
+<ol style="list-style-type: decimal">
+<li>Dataframe 1 - A dataframe with paper_doi as the primary key and relevant columns from the metadata file</li>
+</ol>
+<p>Each article has a corresponding json file that has its metadata. We parse through all the json files in python and generate a dataframe with the relevant columns we would need for analysis. We have 656622 such articles, and hence our final dataframe has 656622 rows - one for each article.<br />
+As an example, let us look at one row of the dataframe corresponding to one article. Please refer to the Data Sources section for a representation of the metadata json file for a particular article.</p>
+<p><img src="datatransformation_python/df_metadata_row.png" width="100%" />
+While generating this dataframe, we ensure that we take care of the following - we filter out the ‘author type’ that is not ‘Person’ because there are instances where a survey group organization might be an ‘author’. We match the affiliation Ids of authors to the names corresponding to those Ids and add them in the paper_affiliations column.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Dataframe 2 - A dataframe with (paper_doi,author_name,author_affiliation) as the composite primary key and relevant columns from Dataframe 1</li>
+</ol>
+<p>As we wanted to look closely at how the factors related to authors, such as their affiliation, their number of co-authors, affect the citations their articles receive, we created a long dataframe where each row was an author, affiliation, and doi. In this dataframe, we have as many rows for a particular author as equal to the number of Physical Review Journal articles they have published. One thing we noticed in the raw metadata is that an author can be affiliated to more than one organization/institute. For ease of our analysis, we are only keeping one affiliated organization per author. Also, if we do not have the affiliation information for an author, we are discarding it from this particular dataframe for ease of analysis.
+The number of rows discarded is small and only x% of the rows were excluded.</p>
+<p>A sample extract of the final dataframe is shown below. In this sample, we have the all the authors of a specific paper as separate row of the dataframe-
+<img src="datatransformation_python/df_authoraff_sample.png" width="100%" /></p>
+<p>Clean up and Transformation in R:<br />
+The above was an initial transformation that we did in Python.After we ingest the the citation pairs csv (provided as a data set) and the two generated metadata csvs from python above, we do some further clean up to remove any missing values. These 3 dataframes form the basis for performing all our analysis, by combining different columns from them and doing calculations on them to generate more dataframes that were used to create visualizations. We provide the code related to these specific transformations within the results section.</p>
 
 </div>
             </section>

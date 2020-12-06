@@ -11,7 +11,7 @@ library(parcoords)
 library(plotly)
 library(vcd)
 
-citations = read.csv("citations.csv")
+citations = read.csv("C:\\Users\\Grace\\Documents\\Columbia DS\\Fall 2020\\EDAV\\Final Project\\final_project\\citations.csv")
 
 citations_count = citations%>%count(cited_doi)
 
@@ -30,7 +30,7 @@ plot(g)
 We can see here that the data is heavily right skewed. A large number of papers receive very few citations. We then ask the question - is there any patterns associated with journal categories?
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-metadata = read.csv("phpaper_metadata_v2.csv")
+metadata = read.csv("C:\\Users\\Grace\\Documents\\Columbia DS\\Fall 2020\\EDAV\\Final Project\\final_project\\phpaper_metadata_v2.csv")
 
 metadata$paper_pub_date <- as.Date(metadata$paper_pub_date)
 
