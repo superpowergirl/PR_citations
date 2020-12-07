@@ -15,13 +15,16 @@ citations = read.csv("citations.csv")
 
 citations_count = citations%>%count(cited_doi)
 
-summary(citations_count)
-
 ```
 
 
 One of the major networking or social aspect of the academic research community is authors writing papers and citing other author's work. But as the corpus of research articles is huge, very few authors and their papers get a very high number of citations for their work. Sidney Redner in her paper, Citation Statistics from 110 Years of Physical Review - http://physics.bu.edu/~redner/pubs/pdf/PT.pdf - calls out this somewhat alarming statistical phenomenon as follows - "A somewhat depressing observation is that nearly 70% of all PR articles have been cited fewer than 10 times. Also evident is the small number of highly cited publications" 
 The histogram confirms that the data is heavily right skewed. A large number of papers receive very few citations. 
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+summary(citations_count)
+
+```
+
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histogram(bins = 32)+
@@ -31,6 +34,7 @@ g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histog
   
 plot(g)
 ```
+
 In order to look at the citations received closely, we divide the dataframe based on the citation_count and assigned them labels.
 The box plot below validates our observation further, where we can clearly see that the papers that receive very high citations are sparse and are dispersed.
   
@@ -43,7 +47,8 @@ ggplot(citations_count%>%dplyr::filter(citations_count$cit_count!='more than 500
   ylab("Count of articles")+
   theme(legend.position = "bottom" )
 ```
-We then ask the question - is there any patterns associated with journal categories?
+
+We then ask the question - are there any patterns associated with journal categories?
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata = read.csv("phpaper_metadata_v2.csv")
@@ -159,11 +164,12 @@ mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of 
 
 The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE. 
 
-All in all we were able to see some interesting trends in 2008.
+All in all, we were able to see some interesting trends in 2008.
 
 Lastly, we do a deep dive on some factors that contribute to the citations received by papers across all the years in our dataset (1893-2019)
 
 We begin by looking at the attributes of the paper - length of the paper, and length of the title of the paper. 
+
 1. Length of the title of a paper - An article in the Nature magazine claims that papers with shorter titles get more citations. We wanted to see if this was applicable to articles/papers published in the physical review journal. And we do see a decrease in number of citations as the length of the title of the paper becomes longer as shown by the scatter plot below.
 
 Note: For this calculation, we remove the papers where titles have a math function in them. This is because the title length includes html tags in them making the title length longer than the actual title.  
