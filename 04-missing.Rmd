@@ -1,1 +1,59 @@
 # Missing values
+
+
+```{r}
+metadata = read.csv("phpaper_metadata_v2.csv")
+```
+
+```{r}
+metadata$paper_pub_date <- as.Date(metadata$paper_pub_date)
+```
+```{r}
+library(ggplot2)
+library(lubridate)
+library(dplyr)
+library(gridExtra)
+```
+
+We read data from two transformed csv files as mentioned in the Data transformation section. One of the files contains the metadata about an article/paper (details are mentioned in the Data sources section).
+Here is a summary of the missing values per column. 
+
+```{r}
+colSums(is.na(metadata))
+```
+
+The paper_length is measured in number of pages. We have a few of the papers as shown above for which we do not have this information. There are few others where the length is 0. 
+
+```{r}
+metadata%>%filter(paper_length ==0)%>%count()%>%select(n)
+```
+
+A plot for the paper_length missing and 0 values are shown as below.
+```{r}
+
+metadata$length_missing<-ifelse(metadata$paper_length ==0, "Yes", ifelse(metadata$paper_length >0,"No", "Yes"))
+metadata[is.na(metadata$paper_length),]$length_missing = "Yes"
+metadata$pub_year = year(metadata$paper_pub_date)
+
+p1<-ggplot(metadata%>%filter(as.numeric(pub_year)>=1893 & as.numeric(pub_year)<=1949), aes(x =pub_year, y = paper_journal_category, fill = length_missing))+ geom_tile(color = "white")+scale_fill_viridis_d()+theme_bw()+theme(legend.position="bottom")
+p2<-ggplot(metadata%>%filter(as.numeric(pub_year)>=1950 & as.numeric(pub_year)<=2000), aes(x =pub_year , y = paper_journal_category, fill = length_missing))+ geom_tile(color = "white")+scale_fill_viridis_d()+theme_bw()+theme(legend.position="bottom")
+p3<-ggplot(metadata%>%filter(as.numeric(pub_year)>=2001 & as.numeric(pub_year)<=2019), aes(x = pub_year, y = paper_journal_category, fill = length_missing))+ geom_tile(color = "white")+scale_fill_viridis_d()+theme_bw()+theme(legend.position="bottom")
+grid.arrange(
+  p1,
+  p2,
+  p3,
+  nrow = 1,
+  top = "Missing paper_length values divided into different time periods")
+```
+
+
+
+We do not delete these rows entirely from our data as there are other columns which we use for some of our visualizations. But we filter it out from our calculation when we look at the affect of just the length of paper on the number of citations received.
+
+In the metadata csv we also have some papers that have author information missing, and some have authors but do not have their affiliations information.
+There are ```{r}metadata%>%filter(paper_authors =='[]')%>%count()``` such observations.
+They appear in the dataframe as '[]' and we count those to get a number of missing author information.
+
+In order to look at author dependent visualizations, we created another transformed csv in python which has the author information and their papers. So we look at only those authors-papers data where author info is available.
+
+We are not using the author affiliation information in our visualization, so we leave them as it is.

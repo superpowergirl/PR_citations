@@ -1,9 +1,12 @@
 --- 
-title: Physical Review Citations
+title: A study of Physical Review Journals and their citation patterns
 author: Akanxa Padhi, Lei Liu
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
 
 # Introduction
+A 2014 New York Times article titled "Papers That are Most Cited Aren't Most Famous" as well as a Nature article from the same year "The top 100 papers" tell us that a popular paper or a popular author of a paper does not receive huge number of citations. Einstein's papers on relativity does not feature in the top 100 cited papers. Interesting and a bit surprising, don't you think?
+We deep-dive into a data set of paper citations in the field of physics, to explore and visualize the evolution of these papers and their citations with time, and also look at what potential factors contribute to high citations in the field of physics review journal articles.
 
+In order to look at popular authors and the citations their papers receive, we look at authors that have received a nobel prize in physics and explore the affect of their fame on the citations their papers have received.
