@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 4 Missing values | Physical Review Citations</title>
-  <meta name="description" content="Chapter 4 Missing values | Physical Review Citations" />
+  <title>Chapter 4 Missing values | A study of Physical Review Journals and their citation patterns</title>
+  <meta name="description" content="Chapter 4 Missing values | A study of Physical Review Journals and their citation patterns" />
   <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 4 Missing values | Physical Review Citations" />
+  <meta property="og:title" content="Chapter 4 Missing values | A study of Physical Review Journals and their citation patterns" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 4 Missing values | Physical Review Citations" />
+  <meta name="twitter:title" content="Chapter 4 Missing values | A study of Physical Review Journals and their citation patterns" />
   
   
   
@@ -24,7 +24,7 @@
 <meta name="author" content="Akanxa Padhi, Lei Liu" />
 
 
-<meta name="date" content="2020-12-06" />
+<meta name="date" content="2020-12-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -99,7 +99,7 @@
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Physical Review Citations</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A study of Physical Review Journals and their citation patterns</a>
           </h1>
         </div>
 
@@ -109,6 +109,29 @@
             <section class="normal" id="section-">
 <div id="missing-values" class="section level1">
 <h1><span class="header-section-number">Chapter 4</span> Missing values</h1>
+<p>We read data from two transformed csv files as mentioned in the Data transformation section. One of the files contains the metadata about an article/paper (details are mentioned in the Data sources section).
+Here is a summary of the missing values per column.</p>
+<pre><code>##                      X              paper_doi 
+##                      0                      0 
+## paper_journal_category         paper_pub_date 
+##                      0                      0 
+##           paper_length          paper_authors 
+##                  10861                      0 
+##    paper_authors_count     paper_affiliations 
+##                      0                      0 
+##            paper_title 
+##                      0</code></pre>
+<p>The paper_length is measured in number of pages. We have a few of the papers as shown above for which we do not have this information. There are few others where the length is 0.</p>
+<pre><code>##       n
+## 1 15541</code></pre>
+<p>A plot for the paper_length missing and 0 values are shown as below.
+<img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>We do not delete these rows entirely from our data as there are other columns which we use for some of our visualizations. But we filter it out from our calculation when we look at the affect of just the length of paper on the number of citations received.</p>
+<p>In the metadata csv we also have some papers that have author information missing, and some have authors but do not have their affiliations information.
+There are <code>{r}metadata%&gt;%filter(paper_authors =='[]')%&gt;%count()</code> such observations.
+They appear in the dataframe as ‘[]’ and we count those to get a number of missing author information.</p>
+<p>In order to look at author dependent visualizations, we created another transformed csv in python which has the author information and their papers. So we look at only those authors-papers data where author info is available.</p>
+<p>We are not using the author affiliation information in our visualization, so we leave them as it is.</p>
 
 </div>
             </section>

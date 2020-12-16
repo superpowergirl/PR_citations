@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Data transformation | Physical Review Citations</title>
-  <meta name="description" content="Chapter 3 Data transformation | Physical Review Citations" />
+  <title>Chapter 3 Data transformation | A study of Physical Review Journals and their citation patterns</title>
+  <meta name="description" content="Chapter 3 Data transformation | A study of Physical Review Journals and their citation patterns" />
   <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 Data transformation | Physical Review Citations" />
+  <meta property="og:title" content="Chapter 3 Data transformation | A study of Physical Review Journals and their citation patterns" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Data transformation | Physical Review Citations" />
+  <meta name="twitter:title" content="Chapter 3 Data transformation | A study of Physical Review Journals and their citation patterns" />
   
   
   
@@ -24,7 +24,7 @@
 <meta name="author" content="Akanxa Padhi, Lei Liu" />
 
 
-<meta name="date" content="2020-12-06" />
+<meta name="date" content="2020-12-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -99,7 +99,7 @@
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Physical Review Citations</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A study of Physical Review Journals and their citation patterns</a>
           </h1>
         </div>
 
@@ -124,7 +124,7 @@ While generating this dataframe, we ensure that we take care of the following - 
 <li>Dataframe 2 - A dataframe with (paper_doi,author_name,author_affiliation) as the composite primary key and relevant columns from Dataframe 1</li>
 </ol>
 <p>As we wanted to look closely at how the factors related to authors, such as their affiliation, their number of co-authors, affect the citations their articles receive, we created a long dataframe where each row was an author, affiliation, and doi. In this dataframe, we have as many rows for a particular author as equal to the number of Physical Review Journal articles they have published. One thing we noticed in the raw metadata is that an author can be affiliated to more than one organization/institute. For ease of our analysis, we are only keeping one affiliated organization per author. Also, if we do not have the affiliation information for an author, we are discarding it from this particular dataframe for ease of analysis.
-The number of rows discarded is small and only x% of the rows were excluded.</p>
+The number of rows discarded is small (detail in the Missing Values section).</p>
 <p>A sample extract of the final dataframe is shown below. In this sample, we have the all the authors of a specific paper as separate row of the dataframe-
 <img src="datatransformation_python/df_authoraff_sample.png" width="100%" /></p>
 <p>Clean up and Transformation in R:<br />

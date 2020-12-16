@@ -3,22 +3,39 @@
 We analyze citation data about Physical Review Journal articles published by the American Physical Society (APS). APS has made available to researchers data based on their publications for use in research about networks and the social aspects of science.  
 
 Physical Review Journals are divided into various categories based on the field of physics and type of articles published in the journals. More detail can be found here - https://journals.aps.org/about  
-Here is a brief overview of the categories -  
+
+Here is a brief overview of the categories - 
+
 * PRL (Physical Review Letters) – weekly coverage of major advances in physics and cross-disciplinary developments
+
 * PRX (Physical Review X) – online-only, open access, peer-reviewed. Publishes exceptional original research papers from all areas of pure,applied and interdisciplinary physics.
+
 * PRA (Physical Review A) – atomic, molecular, and optical physics and quantum information
+
 * PRB (Physical Review B) – condensed matter and material physics
+
 * PRAB – Physical Review Accelerator and Beams
+
 * PRC (Physical Review C) – Nuclear Physics
+
 * PRD (Physical Review D) – particles, fields, gravitation, and cosmology
+
 * PRE – statistical, nonlinear, biological, and soft matter physics
+
 * PRApplied – all aspects of experimental and theoretical applications of physics
+
 * PRFluids – online-only, fundamental understanding of fluids
+
 * PRMaterials – research on materials
+
 * PRPER - Physics Education Research
+
 * PRRESEARCH – all research topics of interest to the physics community
+
 * PRSTAB
+
 * PRSTPER
+
 * RMP – Reviews of Modern Physics – indepth review articles
 
 

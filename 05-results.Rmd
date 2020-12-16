@@ -61,7 +61,7 @@ total$paper_pub_date <- as.Date(total$paper_pub_date)
 
 ggplot(data=total, aes(x = n)) +
   geom_histogram() +
-  ggtitle("Number of Citations by Category") +
+  ggtitle("Number of Citations Received by Category") +
   facet_wrap(~paper_journal_category, scales="free")
 
 ```
@@ -81,7 +81,7 @@ plot_ly(
           mode = 'lines+markers',
           # Hover text:
               hoverinfo = 'text',
-          text = ~paste(Year)
+          text = ~paste(Year,":",paper_doi)
       ) %>% layout(title = "Number of Publications by Year", yaxis=list(title=""))
 
 ```
@@ -103,8 +103,8 @@ plot_ly(
           mode = 'lines+markers',
           # Hover text:
               hoverinfo = 'text',
-          text = ~paste(Year)
-      ) %>% layout(title = "Number of Citations by Publication Year", yaxis=list(title=""))
+          text = ~paste(Year,":", total_n)
+      ) %>% layout(title = "Number of Citations Received by Publication Year", yaxis=list(title=""))
 
 ```
 
@@ -121,7 +121,7 @@ ggplot(monthly, aes(Year, total_n)) +
   geom_line() +
   facet_grid(~Month) +
   ylab("") +
-  ggtitle("Number of Citations by Published Month")
+  ggtitle("Number of Citations Received by Published Month")
 
 ```
 
@@ -150,7 +150,7 @@ The parallel coordinates plot shows us some interesting trends. First, in contra
 
 A few outliers jump out from the graph. For instance, one paper in RMP has the highest paper length but was written by fewer than 5 people and received very few citations. Moreover, the paper that received the highest number of citations and relatively high paper length has fewer than 5 authors.
 
-Furthermore, we would like to see how the number of citations varies across journal categories for the publications in 2008. We focus on the following categories that have meaningful number of total citations in 2008: PRA, PRB, PRC, PRD, PRE and PRL.
+Furthermore, we would like to see how the number of citations varies across journal categories for the publications in 2008. We focus on the following categories that have meaningful number of total citations in 2008: PRA, PRB, PRC, PRD, PRE and PRL. (The definition of each category is shown on page "Data sources".)
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=7}
 recent_mo <- as.data.frame(recent)
@@ -159,10 +159,16 @@ recent_mo <- filter(recent_mo,paper_journal_category %in% c('PRA','PRB','PRC','P
 
 recent_mo$n <- cut(recent_mo$n, breaks = c(-Inf, 6, 15, Inf), labels = c('<6', '[6,15)','>=15'), right = FALSE) #left closed
 
-mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of Citations by Journal Category")
+mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of Citations Received by Journal Category")
 ```
 
-The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE. 
+Note: We picked 6 and 15 to be the breaks so that the number of citations for each interval will be meaningful  across all categories.
+
+```{r}
+summary(recent_mo$n)
+```
+
+The mosaic plot above shows that most papers published in 2008 were in PRB and RPL and that papers in PRL, PRC and PRD received much higher number of citations than PRE, since the percentage of papers with more than 6 citations was much higher in RPL, PRC and PRD than PRE. (The definition of each category is shown on page "Data sources".)
 
 All in all, we were able to see some interesting trends in 2008.
 
