@@ -1,14 +1,14 @@
 # Missing values
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata = read.csv("phpaper_metadata_v2.csv")
 ```
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata$paper_pub_date <- as.Date(metadata$paper_pub_date)
 ```
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(lubridate)
 library(dplyr)
@@ -18,18 +18,18 @@ library(gridExtra)
 We read data from two transformed csv files as mentioned in the Data transformation section. One of the files contains the metadata about an article/paper (details are mentioned in the Data sources section).
 Here is a summary of the missing values per column. 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 colSums(is.na(metadata))
 ```
 
 The paper_length is measured in number of pages. We have a few of the papers as shown above for which we do not have this information. There are few others where the length is 0. 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 metadata%>%filter(paper_length ==0)%>%count()%>%select(n)
 ```
 
 A plot for the paper_length missing and 0 values are shown as below.
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 metadata$length_missing<-ifelse(metadata$paper_length ==0, "Yes", ifelse(metadata$paper_length >0,"No", "Yes"))
 metadata[is.na(metadata$paper_length),]$length_missing = "Yes"
