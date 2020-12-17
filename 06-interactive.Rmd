@@ -1,6 +1,6 @@
 # Interactive component
 
-##Nobel prize winners and their most cited papers
+## Nobel prize winners and their most cited papers
 In this section, we take a look at a few of the nobel prize winners in the field of physics between the years 1990 and 2010. More specifically, we take a look at their most cited physical review journal paper (based on the number of citations it has received from other physical review journal papers), and see how has the paper's citations evolved with time since it was first cited.   
 Please use the interactive graph below to choose a nobel prize winning author to look at the time series.  
 
@@ -216,8 +216,10 @@ function updatePlot(selectedauthor) {
 
 
 As you can see, for these subset of authors that won the Nobel prize in Physics between 1990 and 2009, the time series has interesting peaks and troughs.  
-We look at a few  interesting cases below - 
-1.  Roy J Glauber (2005 Nobel prize winner) -  Their most cited paper received a lot of initial interest immediately after its publication. Subsequently, there was a drop-off until the year of their nobel prize win, after which, possibly due to increased publicity and awareness, the paper received renewed interest and the citations for that paper show an increasing trend. In the graph, the red line is the year when the author wins the nobel prize. And for the aforementioned author, we can see this renewed interest on the right side of the red line.
+
+We look at a few  interesting cases below -  
+
+1.  Roy J Glauber (2005 Nobel prize winner) -  Their most cited paper received a lot of initial interest immediately after its publication. Subsequently, there was a drop-off until the year of their nobel prize win, after which, possibly due to increased publicity and awareness, the paper received renewed interest and the citations for that paper show an increasing trend. In the graph, the red line is the year when the author wins the nobel prize. And for the aforementioned author, we can see this renewed interest on the right side of the red line.  
 
 2. David J Gross and David Politzer (shared the Nobel prize in 2004) - Their most cited physics review journal paper respectively, have a very similar time series evolution. Their papers also show similar renewd interest after their nobel prize win.
 
