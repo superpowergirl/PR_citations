@@ -215,4 +215,8 @@ function updatePlot(selectedauthor) {
 </html>
 
 
+As you can see, for these subset of authors that won the Nobel prize in Physics between 1990 and 2009, the time series has interesting peaks and troughs, and the nobel prize year forms more or less a good boundary point to distinguish the activity on these papers. However, we cannot use this data to conclusively say anything about the effect of nobel prize on citations and also vice-versa.  
+As we mentioned in our introduction, highly cited papers are almost rarely famous papers by famous authors. And we observe that phenomenon in case of many nobel prize authors.
+
+Below graph shows the time series lines for each of the authors in the dropdown above plotted in the same graph.  
 
