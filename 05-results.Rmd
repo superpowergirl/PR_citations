@@ -35,6 +35,15 @@ g <- ggplot(citations_count %>% dplyr::filter(n>2), aes(x=log(n))) + geom_histog
 plot(g)
 ```
 
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+main <- subset(citations_count,n < 50)
+
+ggplot(data=main, aes(x = n)) +
+  geom_histogram(binwidth = 5) +
+  ggtitle("Number of Citations (n < 50)")
+
+```
+
 In order to look at the citations received closely, we divide the dataframe based on the citation_count and assigned them labels.
 The box plot below validates our observation further, where we can clearly see that the papers that receive very high citations are sparse and are dispersed.
   
@@ -79,10 +88,7 @@ plot_ly(
           pub_yearly, x = ~Year, y = ~paper_doi,
           type = 'scatter',
           mode = 'lines+markers',
-          # Hover text:
-              hoverinfo = 'text',
-          text = ~paste(Year,":",paper_doi)
-      ) %>% layout(title = "Number of Publications by Year", yaxis=list(title=""))
+          hovertemplate = "%{x}: %{y:.0f}<extra></extra>") %>% layout(title = "Number of Publications by Year", yaxis=list(title=""))
 
 ```
 
@@ -101,10 +107,7 @@ plot_ly(
           yearly, x = ~Year, y = ~total_n,
           type = 'scatter',
           mode = 'lines+markers',
-          # Hover text:
-              hoverinfo = 'text',
-          text = ~paste(Year,":", total_n)
-      ) %>% layout(title = "Number of Citations Received by Publication Year", yaxis=list(title=""))
+          hovertemplate = "%{x}: %{y:.0f}<extra></extra>") %>% layout(title = "Number of Citations Received by Publication Year", yaxis=list(title=""))
 
 ```
 
@@ -126,6 +129,35 @@ ggplot(monthly, aes(Year, total_n)) +
 ```
 
 While we see a similar pattern across all months in the chart above, instances of extremely high citations were associated with papers published in October, March and July.
+
+After exploring the number of citations a paper received over time, we looked into how long on average it takes for a paper to receive a citation.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+citations$citing_paper_pub_date=metadata$paper_pub_date[match(citations$citing_doi,metadata$paper_doi)]
+
+citations$cited_paper_pub_date=metadata$paper_pub_date[match(citations$cited_doi,metadata$paper_doi)]
+
+citations$diff = as.numeric(difftime(citations$citing_paper_pub_date, citations$cited_paper_pub_date, units ="days"))/(365.25)
+
+cleancitations <- citations[complete.cases(citations), ] #remove NA
+
+yearly2 <- cleancitations %>% 
+  group_by(Year = year(cited_paper_pub_date)) %>%
+  summarise(avg_diff = mean(diff))
+
+plot_ly(
+  yearly2, x = ~Year, y = ~avg_diff,
+  type = 'scatter',
+  mode = 'lines+markers',
+  hovertemplate = "%{x}: %{y:.0f}<extra></extra>") %>% layout(title = "Average number of years for a paper to be cited by its publication year", yaxis=list(title=""))
+
+```
+
+
+Interestingly but perhaps not too surprisingly, the average time it takes for a physics paper to be cited by other physics papers generally goes down as times goes by. The downward trend has been especially clear since 1980.
+
+The growing popularity in social media has enabled researchers to promote their work more efficiently, such as opening a Facebook page to encourage casual discussion of their papers or opening a Twitter account and tweet about their paper. Moreover, research shows that tweeting results in significantly more article citations over time, highlighting the durable scholarly impact of social media activity. (https://www.sciencedirect.com/science/article/pii/S0003497520308602)
+
 
 
 In order to uncover interesting points of our data, we do a deep dive into and a detailed analysis for Year 2008
@@ -164,7 +196,7 @@ mosaic(n~paper_journal_category,direction=c("v","h"),recent_mo, main="Number of 
 
 Note: We picked 6 and 15 to be the breaks so that the number of citations for each interval will be meaningful  across all categories.
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 summary(recent_mo$n)
 ```
 
@@ -172,13 +204,15 @@ The mosaic plot above shows that most papers published in 2008 were in PRB and R
 
 All in all, we were able to see some interesting trends in 2008.
 
-Lastly, we do a deep dive on some factors that contribute to the citations received by papers across all the years in our dataset (1893-2019)
+
+Lastly, we do a deep dive on some factors that contribute to the citations received by papers across all the years in our dataset (1893-2019).
 
 We begin by looking at the attributes of the paper - length of the paper, and length of the title of the paper. 
 
 1. Length of the title of a paper - An article in the Nature magazine claims that papers with shorter titles get more citations. We wanted to see if this was applicable to articles/papers published in the physical review journal. And we do see a decrease in number of citations as the length of the title of the paper becomes longer as shown by the scatter plot below.
 
 Note: For this calculation, we remove the papers where titles have a math function in them. This is because the title length includes html tags in them making the title length longer than the actual title.  
+
 ```{r echo = FALSE, warning = FALSE, message=FALSE}
 metadata_titlecleanup <- metadata[!grepl("<math",metadata$paper_title),]
 metadata_titlecleanup$paper_title_length <-sapply(strsplit(metadata_titlecleanup$paper_title, " "), length)
@@ -217,6 +251,7 @@ names(df2)<-c("paper_length","mean_citations")
 ```
 
 2. Length of the paper - A study by Tahatman, Afshar, Ahamdzadeh on papers published WoS, Scopus, PubMed and Medline believes that longer papers get more citations because they contain more information. (Factors affecting number of citations: a comprehensive review of the literature). We see that phenomenon in physical review journal papers as well as shown in the scatter diagram below.
+
 ```{r echo = FALSE, warning = FALSE, message=FALSE}
 g_citation_length<- ggplot(metadata_less_than_500cit, aes(x=paper_length,y=n_citations))
 g_citation_length<-g_citation_length + stat_summary(fun = "mean", geom="point")
@@ -230,6 +265,7 @@ g_citation_length +
 Now we try to look at the people or social aspect of citations. We want to see what social factors, if any, play a role in increasing or decreasing citations received.
 First, we look at whether or not the number of authors of an article has an effect on the number of citations received by a paper. The scatter diagram below shows the average number of citations received by articles that have a given number of authors. 
 As we saw in the parallel coordinates plot for 2008 papers, we do suspect a slight negative correlation between citations received by a paper and its number of authors, overall in our dataset.
+
 ```{r echo = FALSE, warning = FALSE, message=FALSE}
 citations_count$n_authors=metadata$paper_authors_count[match(citations_count$cited_doi,metadata$paper_doi)]
 ggplot(citations_count, aes(x=factor(n_authors), y = n))+stat_summary(fun = "mean", geom="point")+
@@ -285,8 +321,10 @@ names(df3)<-c("avg_coauthors","median_citations")
 ```
 
 The above result was a little contrary to our belief. So we look at the effect of number of co-authors of an author and how does that help authors receive citations for their articles/papers. 
+
 We see that an increase in collaboration does play a role in increasing citations, but the effect does not hold beyond a certain number of coauthors. First, the increasing trend of citations  as coauthors increase from 0-15 could be due to the fact that co-authored papers are presented in more scientific networks such as conferences, seminars, etc. which boosts their citations.  
 We do see a decreasing trend in citations beyond 15 co-authors.
+
 ```{r echo = FALSE, warning = FALSE, message=FALSE}
 g_citation_coauthor<- ggplot(author_cit_coauthor, aes(x=avg_coauthors,y=citations_received$citations_received))
 g_citation_coauthor<-g_citation_coauthor+ stat_summary(fun = "median", geom="point")
