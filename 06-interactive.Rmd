@@ -41,7 +41,7 @@ Please use the interactive graph below to choose a nobel prize winning author to
 
   var authors = [];
 
-  d3.csv("https://raw.githubusercontent.com/akp21/EDAV_CC20/main/nobelauthor_timeseries.csv").then(function(data)  {
+  d3.csv("https://raw.githubusercontent.com/superpowergirl/PR_citations/akanxa/datatransformation_python/nobelauthor_timeseries_subset.csv").then(function(data)  {
 
     console.log(data)
     var author_names = data.map(function(d) { return d.nobel_author; });
