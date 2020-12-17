@@ -215,8 +215,14 @@ function updatePlot(selectedauthor) {
 </html>
 
 
-As you can see, for these subset of authors that won the Nobel prize in Physics between 1990 and 2009, the time series has interesting peaks and troughs, and the nobel prize year forms more or less a good boundary point to distinguish the activity on these papers. However, we cannot use this data to conclusively say anything about the effect of nobel prize on citations and also vice-versa.  
-As we mentioned in our introduction, highly cited papers are almost rarely famous papers by famous authors. And we observe that phenomenon in case of many nobel prize authors.
+As you can see, for these subset of authors that won the Nobel prize in Physics between 1990 and 2009, the time series has interesting peaks and troughs.  
+We look at a few  interesting cases below - 
+1.  Roy J Glauber (2005 Nobel prize winner) -  Their most cited paper received a lot of initial interest immediately after its publication. Subsequently, there was a drop-off until the year of their nobel prize win, after which, possibly due to increased publicity and awareness, the paper received renewed interest and the citations for that paper show an increasing trend. In the graph, the red line is the year when the author wins the nobel prize. And for the aforementioned author, we can see this renewed interest on the right side of the red line.
 
-Below graph shows the time series lines for each of the authors in the dropdown above plotted in the same graph.  
+2. David J Gross and David Politzer (shared the Nobel prize in 2004) - Their most cited physics review journal paper respectively, have a very similar time series evolution. Their papers also show similar renewd interest after their nobel prize win.
 
+3. Carl Wiemann (2001 Nobel prize winner) - Not all nobel prize winning authors' most cited papers show the above mentioned renewed interest trend in our data. Carl Wiemman's most cited papers has a more or less flat trend. We believe it could be because in our data set we do not have citations received by a paper from journal papers outside of physical review journals. If we had that data, we might have seen a different trend altogether, and would be able to draw a more clear conclusion.
+
+4. We have excluded some nobel prize winners between 1990-2010 from our analysis (and hence from the dropdown above). Their most cited papers have either not received any citations in a long time, and hence none after their nobel prize winning year, or the citations for their most cited physics review journal paper has decreased after their nobel prize win. We speculate this could be for two reasons. First, not all physics nobel prize winners primarily publish in the physics review journal. Their most cited paper or more popular paper might be in some other journal. And as we do not have data of citations from outside physics review journals, we can't say for certain what causes this trend.
+
+For future analysis, we can either look at papers of winners across all journals and find the most cited from that list, or we can look at the citations evolution of papers which are more relevant to their field if study for which they win the nobel prize.

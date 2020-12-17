@@ -17,7 +17,7 @@ citations_count = citations%>%count(cited_doi)
 
 ```
 
-##Frequency Distribution of Citations received by papers
+## Frequency Distribution of Citations received by papers
 One of the major networking or social aspect of the academic research community is authors writing papers and citing other author's work. But as the corpus of research articles is huge, very few authors and their papers get a very high number of citations for their work. Sidney Redner in her paper, Citation Statistics from 110 Years of Physical Review - http://physics.bu.edu/~redner/pubs/pdf/PT.pdf - calls out this somewhat alarming statistical phenomenon as follows - "A somewhat depressing observation is that nearly 70% of all PR articles have been cited fewer than 10 times. Also evident is the small number of highly cited publications" 
 
 In our dataset, we have 563557 papers, with a median citations received value as 6, and a mean citations received value ~15, which is not very high.
@@ -49,7 +49,7 @@ ggplot(citations_count, aes(x=n, y=..density..)) +
   theme(legend.position = "none")
 ```  
 
-##Are there any frequency distributions associated with journal categories?
+## Are there any frequency distributions associated with journal categories?
 
 The different categories of Physical revire papers,based on the topics they cover, have been defined in the section on data sources.  
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
@@ -76,7 +76,7 @@ ggplot(data=total, aes(x = n)) +
 
 From the chart above, we can see that the citation received histogram of all categories are right skewed. However, the number of citations is more concentrated around zero in some categories, such as PR, PRA, PRB, PRC and PRD while less concentrated in other categories such as PRAB, PRFLUIDS and PRAER.
 
-##Time series analysis of physical review papers
+## Time series analysis of physical review papers
 After exploring the data around citations received across all articles, we look at the evolution of publications and citations over time. 
 
 First, we look at the publications data over time to see if there exists any long term secular patterns.
@@ -160,7 +160,7 @@ Interestingly but perhaps not too surprisingly, the average time it takes for a 
 The growing popularity in social media has enabled researchers to promote their work more efficiently, such as opening a Facebook page to encourage casual discussion of their papers or opening a Twitter account and tweet about their paper. Moreover, research shows that tweeting results in significantly more article citations over time, highlighting the durable scholarly impact of social media activity. (https://www.sciencedirect.com/science/article/pii/S0003497520308602)
 
 
-##A deep-dive into the year 2008
+## A deep-dive into the year 2008
 In order to uncover interesting points of our data, we do a deep dive into and a detailed analysis for Year 2008
 
 We are interested in studying the physics papers published in 2008 when the number of citations reached record high.
@@ -205,12 +205,12 @@ The mosaic plot above shows that most papers published in 2008 were in PRB and R
 
 All in all, we were able to see some interesting trends in 2008.
 
-##What helps (or does not help) papers to be cited?
+## What helps (or does not help) papers to be cited?
 Lastly, we do a deep dive on some factors that contribute to the citations received by papers across all the years in our dataset (1893-2019).
 Note: There are outliers in the data viz. very few papers have very high citations, very few papers have more than 25 authors, very few papers are more than 50 pages long, etc. Hence, we choose median for our calculations below as we do not want the outliers to skew the measures.  
 
 
-###What role do the attributes of a paper - length of the paper, and length of the title of the paper - play? 
+### What role do the attributes of a paper - length of the paper, and length of the title of the paper - play? 
 
 1. Length of the title of a paper - An article in the Nature magazine claims that papers with shorter titles get more citations - https://www.nature.com/news/papers-with-shorter-titles-get-more-citations-1.18246. We wanted to see if this was applicable to articles/papers published in the physical review journal. We plot the average number of citations received by papers with a given title length.   
 As shown in the scatter plot below, we do see a decreasing trend in the median number of citations as the length of the title of the paper becomes longer. 
@@ -270,9 +270,9 @@ g_citation_length +
 ```
 Note: For the above calculation, we look at papers that have receieved <=500 total citations, as very few papers (less than 15% of our data set) have very high citations. We do this to reduce noise in our data.  
 
-##Are there any social aspects at play?
+## Are there any social aspects at play?
 Now we look at the people or social aspect of citations. We want to see what social factors, if any, play a role in increasing or decreasing citations received.
-###Authors of a paper - More the merrier? 
+### Authors of a paper - More the merrier? 
 First, we look at whether or not the number of authors of an article has an effect on the number of citations received by a paper. The scatter diagram below shows the median number of citations received by papers that have a given number of authors. 
 We believe collaboration/networking helps in boosting the citations of a paper. Having a co-author is always helpful than working alone, but it looks like when the number of authors increases beyond 3, the median citations stay flat until 15 authors, and then increase again and go downward beyond ~18 co-authors. 
 As we have data of only physics paper citing physics paper, there might be much more citations received by the paper from other journals like IEEE, etc. We believe that an overall number of citations could indicate a stronger correlation between citations and number of authors, but we are not certain about it.
