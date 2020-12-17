@@ -160,9 +160,7 @@ The growing popularity in social media has enabled researchers to promote their 
 
 
 
-In order to uncover interesting points of our data, we do a deep dive into and a detailed analysis for Year 2008
-
-We are interested in studying the physics papers published in 2008 when the number of citations reached record high.
+Recall that in 2008, the number of citations reached a record high. We are interested in further studying the papers published that year to uncover any unusual patterns. Hence, we did a deep dive into Year 2008.
 
 To start with, we used interactive parallel coordinates to identify outliers and the relationship between different categorical variables, such as journal categories, paper length, number of authors and number of citations.
 

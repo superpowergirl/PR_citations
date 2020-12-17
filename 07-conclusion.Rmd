@@ -1,2 +1,8 @@
 # Conclusion
 
+After analyzing the citation patterns of physical review journals, we find that the majority of these papers receives very few citations, which is particularly evident in categories such as PRA, PRB, PRC and PRD. (See definition of each category on "Data sources" page.)
+
+Based on our data from 1893 to 2019, while the number of publications generally goes up over time, the number of citations received by papers experiences a time lag. We find that on average it takes about 12 years to witness the highest number of citations received by papers published in a given year.
+
+Furthermore, the average time it takes for papers to receive their citations have been on a consistent downward trend in recent years. We think this phenomenon is partially caused by the growing popularity of social media, which has been studied by other researchers and proven to be true.
+
