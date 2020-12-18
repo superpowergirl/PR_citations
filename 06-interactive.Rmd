@@ -1,3 +1,230 @@
 # Interactive component
 
+## Nobel prize winners and their most cited papers
+In this section, we take a look at a few of the nobel prize winners in the field of physics between the years 1990 and 2010. More specifically, we take a look at their most cited physical review journal paper (based on the number of citations it has received from other physical review journal papers), and see how has the paper's citations evolved with time since it was first cited.   
+Please use the interactive graph below to choose a nobel prize winning author to look at the time series.  
 
+<script src="https://d3js.org/d3.v6.js"></script>
+<style type ="text/css">
+      .line {
+        fill: none;
+        stroke: blue;
+        stroke-width: 1.5px;
+      }
+</style>
+
+
+
+  <h2>Nobel Prize winners and their most cited physical review journal papers</h2>
+  <p>Select a winner from the dropdown to see the time series of citations received on their most cited paper</p>
+  <select id="selectButton"></select>
+
+<div id="nobel"></div>
+
+  <script>
+  var w = 1000;
+  var h = 500;
+  var margin = {top: 25, right: 25, bottom: 50, left: 50};
+  var innerWidth = w - margin.left - margin.right;
+  var innerHeight = h - margin.top - margin.bottom;
+
+  var svg = d3.select("div#nobel") // append svg to div
+    .append("svg")
+      .attr("width", w)
+      .attr("height", h);
+  svg.append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", w)
+      .attr("height", h)
+      .attr("fill", "aliceblue");
+
+  var authors = [];
+
+  d3.csv("https://raw.githubusercontent.com/superpowergirl/PR_citations/akanxa/datatransformation_python/nobelauthor_timeseries_subset.csv").then(function(data)  {
+
+    console.log(data)
+    var author_names = data.map(function(d) { return d.nobel_author; });
+    console.log(author_names)
+    var author_name_set = new Set(author_names)
+    var author_name_unique = Array.from(author_name_set)
+    console.log(author_name_unique)
+    d3.select("#selectButton")
+      .selectAll('authoroptions')
+      .data(author_name_unique)
+      .enter()
+      .append('option')
+      .text(function (d) {return d;})
+      .attr("value", function (d) {return d;})
+      .property("selected", function(d){return d === "Select a nobel prize winner"})
+
+
+  var xScale = d3.scaleLinear()
+      .domain([d3.min(data, function(d) {return +d.cited_year;}),d3.max(data, function(d) {return +d.cited_year;})])   // convert to numeric with "+"
+      .range([0, innerWidth]);
+    console.log(xScale.domain());
+
+    var yScale = d3.scaleLinear()
+      .domain([0, d3.max(data, function(d) {return +d.n;})]) // convert to numeric
+      .range([innerHeight, 0]);
+
+    var xAxis = d3.axisBottom()
+      .scale(xScale).tickFormat(d3.format("d"));
+
+    var yAxis = d3.axisLeft()
+      .scale(yScale);
+
+  svg.append("g")
+      .attr("class", "xAxis")
+      .attr("transform", `translate (${margin.left}, ${h - margin.bottom})`)
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "yAxis")
+      .attr("transform", `translate (${margin.left}, ${margin.top})`)
+      .call(yAxis);
+
+// x-axis label
+  svg.append("text")
+      .attr("transform",
+            "translate(" + (innerWidth/2) + " ," +
+                           (innerHeight + margin.top + 35) + ")")
+      .style("text-anchor", "middle")
+      .text("Year of citations received");
+
+// y-axis label
+ svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0- margin.left +50)
+      .attr("x",0 - (innerHeight / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Number of citations received");
+
+// create initial items
+
+d3.select("svg")
+  .append("g")
+  .attr("id", "plot")
+  .attr("transform", `translate (${margin.left}, ${margin.top})`);
+
+d3.select("g#plot")
+  .append("path");
+
+d3.select("g#plot")
+   .append("line");
+
+d3.select("g#plot")
+   .append("line")
+   .attr("id","line1");
+d3.select("g#plot")
+   .append("line")
+   .attr("id","line2");
+
+d3.select("g#plot")
+  .append("text")
+  .attr("id","text1");
+d3.select("g#plot")
+  .append("text")
+  .attr("id","text2");
+
+function updatePlot(selectedauthor) {
+
+    function getFilteredData(data, nobel_author) {
+	return data.filter(function(d) { return d.nobel_author === selectedauthor; });
+}
+    //var dataFilter = data.map(function(d){return {author_name:selectedauthor, value:d.avg_cit_before} })
+
+  var dataFilter = getFilteredData(data,selectedauthor)
+  console.log(dataFilter)
+
+   var line_gen = d3.line()
+          .x(d=> xScale(d.cited_year))
+          .y(d=> yScale(d.n));
+    var nobel_year = d3.max(dataFilter, function(d) {return d.nobel_year;})
+    
+    var max_cited_year=d3.max(dataFilter, function(d) {return d.cited_year;})
+    var paper_name=d3.max(dataFilter, function(d) {return d.cited_doi;})
+//vertical line
+  svg.select("g#plot")
+    .select("line")
+    .attr("x1", xScale(nobel_year))
+    .attr("y1", 0)
+    .attr("x2", xScale(nobel_year))
+    .attr("y2", h - margin.bottom-20)
+    .style("stroke-width", 2)
+    .style("stroke", "red")
+    .style("fill", "none");
+
+// line chart
+    svg.select("g#plot")
+      .select("path")
+        .datum(dataFilter)
+        .attr("d", line_gen)
+        .attr("class", "line");
+    
+    svg.select("g#plot")
+    .select("#line1")
+    .attr("x1", 800)
+    .attr("y1", 100)
+    .attr("x2", 820)
+    .attr("y2", 100)
+    .style("stroke-width", 2)
+    .style("stroke", "red")
+    .style("fill", "none");
+    
+    svg.select("g#plot")
+    .select("#line2")
+    .attr("x1", 800)
+    .attr("y1", 120)
+    .attr("x2", 820)
+    .attr("y2", 120)
+    .style("stroke-width", 2)
+    .style("stroke", "blue")
+    .style("fill", "none");
+    
+    svg.select("g#plot")
+      .select("#text1")
+      .attr("x", 820)
+      .attr("y", 100)
+      .text("Nobel prize year")
+      .style("font-size", "15px")
+      .attr("alignment-baseline","middle")
+    svg.select("g#plot")
+      .select("#text2")
+      .attr("x", 820)
+      .attr("y", 120)
+      .text("Citations time series")
+      .style("font-size", "15px")
+      .attr("alignment-baseline","middle")
+  }
+    d3.select("#selectButton").on("change", function(d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value")
+        console.log(selectedOption)
+        // run the updateChart function with this selected option
+        updatePlot(selectedOption)
+  })
+
+  });
+
+    </script>
+
+  </body>
+
+</html>
+
+
+As you can see, for these subset of authors that won the Nobel prize in Physics between 1990 and 2009, the time series has interesting peaks and troughs.  
+
+We look at a few  interesting cases below -  
+
+1.  Roy J Glauber (2005 Nobel prize winner) -  Their most cited paper received a lot of initial interest immediately after its publication. Subsequently, there was a drop-off until the year of their nobel prize win, after which, possibly due to increased publicity and awareness, the paper received renewed interest and the citations for that paper show an increasing trend. In the graph, the red line is the year when the author wins the nobel prize. And for the aforementioned author, we can see this renewed interest on the right side of the red line.  
+
+2. David J Gross and David Politzer (shared the Nobel prize in 2004) - Their most cited physics review journal paper respectively, have a very similar time series evolution. Their papers also show similar renewd interest after their nobel prize win.
+
+3. Carl Wiemann (2001 Nobel prize winner) - Not all nobel prize winning authors' most cited papers show the above mentioned renewed interest trend in our data. Carl Wiemman's most cited papers has a more or less flat trend. We believe it could be because in our data set we do not have citations received by a paper from journal papers outside of physical review journals. If we had that data, we might have seen a different trend altogether, and would be able to draw a more clear conclusion.
+
+4. We have excluded some nobel prize winners between 1990-2010 from our analysis (and hence from the dropdown above). Their most cited papers have either not received any citations in a long time, and hence none after their nobel prize winning year, or the citations for their most cited physics review journal paper has decreased after their nobel prize win. We speculate this could be for two reasons. First, not all physics nobel prize winners primarily publish in the physics review journal. Their most cited paper or more popular paper might be in some other journal. And as we do not have data of citations from outside physics review journals, we can't say for certain what causes this trend.
+
+For future analysis, we can either look at papers of winners across all journals and find the most cited from that list, or we can look at the citations evolution of papers which are more relevant to their field if study for which they win the nobel prize.
