@@ -40,13 +40,19 @@ ggplot(data=main, aes(x = n)) +
 
 ```
 
+We also plot the histogram of papers which have citations received between 50 and 500 separately to show that the y-scale is different in this graph by several orders of magnitude compared to the above graph.  
+Together the above and below graph cover almost 99% of the papers in our data set. The change in scale indicates the sharp power law relationship between the number of papers receiving a given number of citations.  
+
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(citations_count, aes(x=n, y=..density..)) +
-  geom_density(color="blue")+ scale_x_log10() + 
-  xlab("Number of citations received by articles - Log scale")+
-  ylab("Count of articles receiving a specific number of citations")+
-  labs(title="Density Histogram of citations received by papers")+theme_bw()+theme(plot.title = element_text(hjust=0.5))+
-  theme(legend.position = "none")
+main_1 <- subset(citations_count,n >= 50 & n<=500)
+
+ggplot(data=main_1, aes(x = n)) +
+  geom_histogram(binwidth = 5) +
+  ggtitle("Histogram of Number of Citations (50<=n<=500)")+
+  xlab("n (Number of citations received by papers)")+
+  ylab("Count of papers that have been cited n times")+
+  theme_bw()+theme(plot.title = element_text(hjust=0.5))
+
 ```  
 
 ## Are there any frequency distributions associated with journal categories?
@@ -301,12 +307,12 @@ g1<- g1+geom_smooth(data=df4,aes(x=as.numeric(n_authors),y=median_citations), sp
 
 A paper entitled "The relationship between the number of authors of a publication, its citations and the impact factor of the publishing journal: Evidence from Italy" -https://www.sciencedirect.com/science/article/pii/S1751157715200557 - mentions that the review articles in the field of physics show a high positive correlation between the number of citations received and the number of authors.  
 From the scatter plot below, that contains only RMP (Review of Modern Physics) papers,we see that the median citations is higher than the median citations compouted across all categories in the graph above. And even though a high positive correlation is not evident in the below graph, the inclusion of citations outside of physics review journals might provide a clearer evidence.
-```{r}
+```{r echo = FALSE, warning = FALSE, message=FALSE}
 citations_count$journal_category<- metadata$paper_journal_category[match(citations_count$cited_doi,metadata$paper_doi)]
 ```
 
 
-```{r}
+```{r echo = FALSE, warning = FALSE, message=FALSE}
 citations_count_RMP<-citations_count%>%filter(citations_count$journal_category=='RMP')
 ```
 `
