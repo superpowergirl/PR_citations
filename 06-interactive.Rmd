@@ -1,6 +1,8 @@
 # Interactive component
 
-## Nobel prize winners and their most cited papers
+Nobel prize winners and their most cited papers
+
+
 In this section, we take a look at a few of the nobel prize winners in the field of physics between the years 1990 and 2010. More specifically, we take a look at their most cited physical review journal paper (based on the number of citations it has received from other physical review journal papers), and see how has the paper's citations evolved with time since it was first cited.   
 Please use the interactive graph below to choose a nobel prize winning author to look at the time series.  
 
@@ -22,7 +24,7 @@ Please use the interactive graph below to choose a nobel prize winning author to
 <div id="nobel"></div>
 
   <script>
-  var w = 1000;
+  var w = 600;
   var h = 500;
   var margin = {top: 25, right: 25, bottom: 50, left: 50};
   var innerWidth = w - margin.left - margin.right;
