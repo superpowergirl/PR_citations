@@ -15,7 +15,7 @@ library(dplyr)
 library(gridExtra)
 ```
 
-We read data from two transformed csv files as mentioned in the Data transformation section. One of the files contains the metadata about an article/paper (details are mentioned in the Data sources section).
+We read data from a transformed csv file as mentioned in the Data transformation section. The file contains the metadata about an article/paper (details are mentioned in the Data sources section).
 Here is a summary of the missing values per column. 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}

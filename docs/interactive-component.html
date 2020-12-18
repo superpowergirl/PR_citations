@@ -85,7 +85,16 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a><ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#frequency-distribution-of-citations-received-by-papers"><i class="fa fa-check"></i><b>5.1</b> Frequency Distribution of Citations received by papers</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#are-there-any-frequency-distributions-associated-with-journal-categories"><i class="fa fa-check"></i><b>5.2</b> Are there any frequency distributions associated with journal categories?</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#time-series-analysis-of-physical-review-papers"><i class="fa fa-check"></i><b>5.3</b> Time series analysis of physical review papers</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#a-deep-dive-into-the-year-2008"><i class="fa fa-check"></i><b>5.4</b> A deep-dive into the year 2008</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#what-helps-or-does-not-help-papers-to-be-cited"><i class="fa fa-check"></i><b>5.5</b> What helps (or does not help) papers to be cited?</a><ul>
+<li class="chapter" data-level="5.5.1" data-path="results.html"><a href="results.html#what-role-do-the-attributes-of-a-paper---length-of-the-paper-and-length-of-the-title-of-the-paper---play"><i class="fa fa-check"></i><b>5.5.1</b> What role do the attributes of a paper - length of the paper, and length of the title of the paper - play?</a></li>
+<li class="chapter" data-level="5.5.2" data-path="results.html"><a href="results.html#are-there-any-social-aspects-at-play"><i class="fa fa-check"></i><b>5.5.2</b> Are there any social aspects at play?</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
@@ -109,7 +118,6 @@
             <section class="normal" id="section-">
 <div id="interactive-component" class="section level1">
 <h1><span class="header-section-number">Chapter 6</span> Interactive component</h1>
-<p>Nobel prize winners and their most cited papers</p>
 <p>In this section, we take a look at a few of the nobel prize winners in the field of physics between the years 1990 and 2010. More specifically, we take a look at their most cited physical review journal paper (based on the number of citations it has received from other physical review journal papers), and see how has the paper’s citations evolved with time since it was first cited.<br />
 Please use the interactive graph below to choose a nobel prize winning author to look at the time series.</p>
 <script src="https://d3js.org/d3.v6.js"></script>
@@ -120,9 +128,9 @@ Please use the interactive graph below to choose a nobel prize winning author to
         stroke-width: 1.5px;
       }
 </style>
-<h2>
+<h3>
 Nobel Prize winners and their most cited physical review journal papers
-</h2>
+</h3>
 <p>
 Select a winner from the dropdown to see the time series of citations received on their most cited paper
 </p>
@@ -131,7 +139,7 @@ Select a winner from the dropdown to see the time series of citations received o
 
 </div>
 <script>
-  var w = 600;
+  var w = 800;
   var h = 500;
   var margin = {top: 25, right: 25, bottom: 50, left: 50};
   var innerWidth = w - margin.left - margin.right;
@@ -274,9 +282,9 @@ function updatePlot(selectedauthor) {
     
     svg.select("g#plot")
     .select("#line1")
-    .attr("x1", 800)
+    .attr("x1", 600)
     .attr("y1", 100)
-    .attr("x2", 820)
+    .attr("x2", 620)
     .attr("y2", 100)
     .style("stroke-width", 2)
     .style("stroke", "red")
@@ -284,9 +292,9 @@ function updatePlot(selectedauthor) {
     
     svg.select("g#plot")
     .select("#line2")
-    .attr("x1", 800)
+    .attr("x1", 600)
     .attr("y1", 120)
-    .attr("x2", 820)
+    .attr("x2", 620)
     .attr("y2", 120)
     .style("stroke-width", 2)
     .style("stroke", "blue")
@@ -294,16 +302,16 @@ function updatePlot(selectedauthor) {
     
     svg.select("g#plot")
       .select("#text1")
-      .attr("x", 820)
+      .attr("x", 620)
       .attr("y", 100)
       .text("Nobel prize year")
       .style("font-size", "15px")
       .attr("alignment-baseline","middle")
     svg.select("g#plot")
       .select("#text2")
-      .attr("x", 820)
+      .attr("x", 620)
       .attr("y", 120)
-      .text("Citations time series")
+      .text("Time series")
       .style("font-size", "15px")
       .attr("alignment-baseline","middle")
   }

@@ -22,7 +22,7 @@ citations_count = citations%>%count(cited_doi)
 
 One of the major networking or social aspect of the academic research community is authors writing papers and citing other author's work. But as the corpus of research articles is huge, very few authors and their papers get a very high number of citations for their work. Sidney Redner in her paper, Citation Statistics from 110 Years of Physical Review - http://physics.bu.edu/~redner/pubs/pdf/PT.pdf - calls out this somewhat alarming statistical phenomenon as follows - "A somewhat depressing observation is that nearly 70% of all PR articles have been cited fewer than 10 times. Also evident is the small number of highly cited publications" 
 
-In our dataset, we have 563557 papers, with a median citations received value as 6, and a mean citations received value ~15, which is not very high.  
+In our dataset, we have 563,557 papers, with a median citations received value as 6, and a mean citations received value ~15, which is not very high.  
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 summary(citations_count)
@@ -85,7 +85,7 @@ ggplot(data=total, aes(x = n)) +
 
 ```
 
-From the chart above, we can see that the citation received histogram of all categories are right skewed. However, the number of citations is more concentrated around zero in some categories, such as PR, PRA, PRB, PRC and PRD while less concentrated in other categories such as PRAB, PRFLUIDS and PRAER.
+From the chart above, we can see that the citation received histogram of all categories are right skewed. However, the number of citations is more concentrated around zero in some categories, such as PR, PRA, PRB, PRC and PRD while less concentrated in other categories such as PRAB, PRFLUIDS and PRAER. (The definition of each category is shown on page "Data sources".)
 
 ## Time series analysis of physical review papers  
 
@@ -246,7 +246,7 @@ ggplot(metadata_titlecleanup, aes(x=paper_title_length, y = n_citations))+
   theme_bw()+theme(plot.title = element_text(hjust=0.5))
 ```
   
-Note: For the above calculation, we remove the papers where titles have a math function in them. This is because the title length includes html references in them making the title length longer than the actual title.  25% of papers in our dataset have such titles, and we exclude them from this calculation only. We believe that 75% of our dataset is a good representation of the entire dataset of 656622 observations.   
+Note: For the above calculation, we remove the papers where titles have a math function in them. This is because the title length includes html references in them making the title length longer than the actual title.  25% of papers in our dataset have such titles, and we exclude them from this calculation only. We believe that 75% of our dataset is a good representation of the entire dataset of 656,622 observations.   
 
 ```{r echo = FALSE, warning = FALSE, message=FALSE}
 metadata[,'paper_authors_count']<-factor(metadata[,'paper_authors_count'])
@@ -290,7 +290,7 @@ Note: For the above calculation, we look at papers that have receieved <=500 tot
 ### Are there any social aspects at play?  
 
 Now we look at the people or social aspect of citations. We want to see what social factors, if any, play a role in increasing or decreasing citations received.
-Authors of a paper - More the merrier?   
+Authors of a paper - the more the merrier?   
 
 First, we look at whether or not the number of authors of an article has an effect on the number of citations received by a paper. The scatter diagram below shows the median number of citations received by papers that have a given number of authors. 
 We believe collaboration/networking helps in boosting the citations of a paper. Having a co-author is always helpful than working alone, but it looks like when the number of authors increases beyond 3, the median citations stay flat until 15 authors, and then increase again and go downward beyond ~18 co-authors. 

@@ -3,5 +3,12 @@ data-sources
 data-transformation
 missing-values
 results
+frequency-distribution-of-citations-received-by-papers
+are-there-any-frequency-distributions-associated-with-journal-categories
+time-series-analysis-of-physical-review-papers
+a-deep-dive-into-the-year-2008
+what-helps-or-does-not-help-papers-to-be-cited
+what-role-do-the-attributes-of-a-paper---length-of-the-paper-and-length-of-the-title-of-the-paper---play
+are-there-any-social-aspects-at-play
 interactive-component
 conclusion

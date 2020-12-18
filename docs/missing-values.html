@@ -85,7 +85,16 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a><ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#frequency-distribution-of-citations-received-by-papers"><i class="fa fa-check"></i><b>5.1</b> Frequency Distribution of Citations received by papers</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#are-there-any-frequency-distributions-associated-with-journal-categories"><i class="fa fa-check"></i><b>5.2</b> Are there any frequency distributions associated with journal categories?</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#time-series-analysis-of-physical-review-papers"><i class="fa fa-check"></i><b>5.3</b> Time series analysis of physical review papers</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#a-deep-dive-into-the-year-2008"><i class="fa fa-check"></i><b>5.4</b> A deep-dive into the year 2008</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#what-helps-or-does-not-help-papers-to-be-cited"><i class="fa fa-check"></i><b>5.5</b> What helps (or does not help) papers to be cited?</a><ul>
+<li class="chapter" data-level="5.5.1" data-path="results.html"><a href="results.html#what-role-do-the-attributes-of-a-paper---length-of-the-paper-and-length-of-the-title-of-the-paper---play"><i class="fa fa-check"></i><b>5.5.1</b> What role do the attributes of a paper - length of the paper, and length of the title of the paper - play?</a></li>
+<li class="chapter" data-level="5.5.2" data-path="results.html"><a href="results.html#are-there-any-social-aspects-at-play"><i class="fa fa-check"></i><b>5.5.2</b> Are there any social aspects at play?</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
@@ -109,7 +118,7 @@
             <section class="normal" id="section-">
 <div id="missing-values" class="section level1">
 <h1><span class="header-section-number">Chapter 4</span> Missing values</h1>
-<p>We read data from two transformed csv files as mentioned in the Data transformation section. One of the files contains the metadata about an article/paper (details are mentioned in the Data sources section).
+<p>We read data from a transformed csv file as mentioned in the Data transformation section. The file contains the metadata about an article/paper (details are mentioned in the Data sources section).
 Here is a summary of the missing values per column.</p>
 <pre><code>##                      X              paper_doi 
 ##                      0                      0 
@@ -121,17 +130,32 @@ Here is a summary of the missing values per column.</p>
 ##                      0                      0 
 ##            paper_title 
 ##                      0</code></pre>
-<p>The paper_length is measured in number of pages. We have a few of the papers as shown above for which we do not have this information. There are few others where the length is 0.</p>
+<p>Meta data Columns and their description -<br />
+1. X - index of the column<br />
+2. paper_doi - DOI/ID of the paper<br />
+3. paper_journal_category - Type of physics review journal where the paper is published<br />
+4. paper_pub_date - Date of paper publication<br />
+5. paper_length - Number of pages<br />
+6. paper_authors - Authors of the paper<br />
+7. paper_authors_count - Number of authors of the paper<br />
+8. paper_affiliations - Affiliations of authors
+9. paper_title - Title of the paper</p>
+<p>The paper_length is measured in number of pages. We have a few of the papers as shown above for which we do not have this information. There are few others where the length is 0, and the number if shown below.</p>
 <pre><code>##       n
 ## 1 15541</code></pre>
-<p>A plot for the paper_length missing and 0 values are shown as below.
-<img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>A plot for the paper_length missing and paper_length 0 values are shown as below. As we have a lot of rows in our data set, we graph the missing values by dividing our data into 3 different time periods - 1893-1949, 1950-2000, and 2001 - 2019 as shown below.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-13-1.png" width="576" /><img src="finalproj_files/figure-html/unnamed-chunk-13-2.png" width="576" /><img src="finalproj_files/figure-html/unnamed-chunk-13-3.png" width="576" /></p>
+<p>One thing to note in all the graphs above - Not all categories of physics review journal papers came into effect at the same time. For instance, PRI papers were the earliest and got discontinued after 1912. PR and RMP paers came in later, and all other categories came to exist in subsequent years. Hence we see white gaps in our graphs. These are not missing data, but just that a category did not exist until a certain time.</p>
+<p>We see that between 1893 - 1949, there is paper_length missing for a few PR, PRI, and RMP papers. PR and RMP journal categories start in the year 1913 and 1928 respectively. We have a few missing paper_length information between 1949-2000. But after 2000, we do not have any missing paper_length.</p>
 <p>We do not delete these rows entirely from our data as there are other columns which we use for some of our visualizations. But we filter it out from our calculation when we look at the affect of just the length of paper on the number of citations received.</p>
-<p>In the metadata csv we also have some papers that have author information missing, and some have authors but do not have their affiliations information.
-There are <code>{r}metadata%&gt;%filter(paper_authors =='[]')%&gt;%count()</code> such observations.
-They appear in the dataframe as ‘[]’ and we count those to get a number of missing author information.</p>
-<p>In order to look at author dependent visualizations, we created another transformed csv in python which has the author information and their papers. So we look at only those authors-papers data where author info is available.</p>
-<p>We are not using the author affiliation information in our visualization, so we leave them as it is.</p>
+<p>In the metadata csv we also have some papers that have author information missing, and some have authors but do not have their affiliations information. They appear in the dataframe as ‘[]’ and we count those to get a number of missing author information.
+There are 10440 such observations, which is approximately 1% of our total records.</p>
+<pre><code>##       n
+## 1 10440</code></pre>
+<p>For author information dependent graphs, we exclude these records from our dataset for calculations.</p>
+<p>Lastly, in our main data file that has pair-wise citations, we do not have any records missing as shown below.</p>
+<pre><code>## citing_doi  cited_doi 
+##          0          0</code></pre>
 
 </div>
             </section>
