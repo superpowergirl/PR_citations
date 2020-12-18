@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 .DS_Store
-*.csv
+citations.csv
+phpaper_metadata_v2.csv
